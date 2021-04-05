@@ -12,8 +12,8 @@ import pacman.game.maze.pellets.PowerPellet;
 import pacman.utils.Direction;
 
 public class PacMan extends Entity {
-	private static int MIN_ANGLE = 270, MAX_ANGLE = 360, ANIM_SPEED = 1000, SPEED = 128, SPEED_PER_FRAME, RANGE_OF_EATING = 2;
-	private static float SIZE = 0.75f;
+	private static int MIN_ANGLE = 270, MAX_ANGLE = 360, ANIM_SPEED = 1000, SPEED = 120, RANGE_OF_EATING = 2;
+	private static float SPEED_PER_FRAME, SIZE = 0.75f;
 	private int angle, score;
 	private boolean animationForward;
 	private Direction direction, nextDirection;
@@ -23,7 +23,7 @@ public class PacMan extends Entity {
 		this.direction = null;
 		this.angle = MIN_ANGLE;
 		this.score = 0;
-		SPEED_PER_FRAME = SPEED/Application.FPS;
+		SPEED_PER_FRAME = (float) SPEED/(float) Application.FPS;
 	}
 
 	@Override
@@ -54,10 +54,8 @@ public class PacMan extends Entity {
 			direction = nextDirection;
 		}
 		
-//		System.out.println(direction);
-		
 		if (direction != null) {
-			int distance = game.isEnoughSpaceInDirection(this, direction, SPEED_PER_FRAME);
+			float distance = game.isEnoughSpaceInDirection(this, direction, SPEED_PER_FRAME);
 			if (distance < 0) {
 				Application.playSound(Clips.move1, false);
 				switch (direction) {

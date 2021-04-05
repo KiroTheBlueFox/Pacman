@@ -99,11 +99,11 @@ public class Game extends JPanel {
 	 * @param distance Distance to go
 	 * @return Something below 0 if there is enough space<br>The distance otherwise
 	 */
-	public int isEnoughSpaceInDirection(Entity entity, Direction direction, int distance) {
-		int playerLeft = entity.getX(),
-			playerRight = entity.getX()+entity.getWidth(),
-			playerUp = entity.getY(),
-			playerDown = entity.getY()+entity.getHeight();
+	public float isEnoughSpaceInDirection(Entity entity, Direction direction, float distance) {
+		float playerLeft = entity.getX(),
+				playerRight = entity.getX()+entity.getWidth(),
+				playerUp = entity.getY(),
+				playerDown = entity.getY()+entity.getHeight();
 		for (Rectangle wall : currentMaze.getWalls()) {
 			switch (direction) {
 			case DOWN:

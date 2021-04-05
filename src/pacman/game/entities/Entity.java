@@ -7,7 +7,7 @@ import pacman.game.Game;
 
 public abstract class Entity {
 	protected String id;
-	protected int x, y, width, height;
+	protected float x, y, width, height;
 	protected double lifeTime;
 	protected Game game;
 	
@@ -24,7 +24,7 @@ public abstract class Entity {
 	
 	public void drawDebug(Graphics2D brush) {
 		brush.setColor(Color.red);
-		brush.drawRect(x, y, width, height);
+		brush.drawRect(Math.round(x), Math.round(y), Math.round(width), Math.round(height));
 	}
 	
 	public void act(double delta) {
@@ -39,39 +39,39 @@ public abstract class Entity {
 		return id;
 	}
 	
-	public int getX() {
+	public float getX() {
 		return x;
 	}
 	
-	public int getY() {
+	public float getY() {
 		return y;
 	}
 	
-	public int getWidth() {
+	public float getWidth() {
 		return width;
 	}
 	
-	public int getHeight() {
+	public float getHeight() {
 		return height;
 	}
 	
-	public void setX(int x) {
+	public void setX(float x) {
 		this.x = x;
 	}
 	
-	public void setY(int y) {
+	public void setY(float y) {
 		this.y = y;
 	}
 	
-	public void setWidth(int width) {
+	public void setWidth(float width) {
 		this.width = width;
 	}
 	
-	public void setHeight(int height) {
+	public void setHeight(float height) {
 		this.height = height;
 	}
 	
-	public void move(int x, int y) {
+	public void move(float x, float y) {
 		this.x += x;
 		this.y += y;
 		if (this.x > game.getCurrentMaze().getWidth()) {
