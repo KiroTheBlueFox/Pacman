@@ -19,39 +19,39 @@ public class Application {
 	public static int FPS = 60;
 	public static boolean debug = false;
 	
-    public static void main(String[] args) {
-    	Clips.initClips();
-    	
-        window = new JFrame();
-        
-        game = new Game();
-        window.add(game);
+	public static void main(String[] args) {
+		Clips.initClips();
+		
+		window = new JFrame();
+		
+		game = new Game();
+		window.add(game);
 
-        window.setSize(464, 568);
+		window.setSize(464, 568);
 
-        window.setTitle("Pac-Man");
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setLocationRelativeTo(null);
-        window.setResizable(false);
-        
-        window.setVisible(true);
+		window.setTitle("Pac-Man");
+		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		window.setLocationRelativeTo(null);
+		window.setResizable(false);
+		
+		window.setVisible(true);
 
-        startGame();
-        
-    	window.addKeyListener(new GameKeyListener());
-        
-    	Timer timer = new Timer();
-    	timer.schedule(new AppRefresher(), 0, 1000/FPS);
-    }
-    
-    private static void startGame() {
-    	Maze maze = new ClassicMaze();
-		game.setCurrentMaze(maze);
-        
-        player = new PacMan(maze.getPlayerSpawnX()-8, maze.getPlayerSpawnY()-8);
-    	game.addActor(player);
+		startGame();
+		
+		window.addKeyListener(new GameKeyListener());
+		
+		Timer timer = new Timer();
+		timer.schedule(new AppRefresher(), 0, 1000/FPS);
 	}
-    
+	
+	private static void startGame() {
+		Maze maze = new ClassicMaze();
+		game.setCurrentMaze(maze);
+		
+		player = new PacMan(maze.getPlayerSpawnX()-8, maze.getPlayerSpawnY()-8);
+		game.addActor(player);
+	}
+	
 	public static synchronized boolean playSound(Clip clip, int times, boolean force) {
 		if (force || !clip.isActive()) {
 			clip.stop();
@@ -68,17 +68,17 @@ public class Application {
 	public static void stopSound(Clip clip) {
 		clip.stop();
 	}
-    
-    public static Game getGame() {
+	
+	public static Game getGame() {
 		return game;
 	}
-    
-    public static PacMan getPlayer() {
+	
+	public static PacMan getPlayer() {
 		return player;
 	}
-    
-    public static void close() {
-    	window.dispose();
-    	System.exit(0);
+	
+	public static void close() {
+		window.dispose();
+		System.exit(0);
 	}
 }

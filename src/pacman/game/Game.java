@@ -23,45 +23,45 @@ public class Game extends JPanel {
 	private RenderingHints rh;
 
 	public Game() {
-    	this.actors = new ArrayList<Entity>(); 
-    	
-        rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        rh.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-    }
+		this.actors = new ArrayList<Entity>(); 
+		
+		rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		rh.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+	}
 	
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D brush = (Graphics2D) g.create();
-        brush.setRenderingHints(rh);
-        
-        brush.setColor(Color.black);
-        brush.fillRect(0, 0, (int) getWidth(), (int) getHeight());
+		brush.setRenderingHints(rh);
+		
+		brush.setColor(Color.black);
+		brush.fillRect(0, 0, (int) getWidth(), (int) getHeight());
 
-        brush.setColor(Color.blue);
-        if (currentMaze != null) {
-        	currentMaze.draw(brush);
-        	if (Application.debug)
-        		currentMaze.drawDebug(brush);
-        	
-    		brush.setColor(Color.white);
-        	for (Pellet[] line : currentMaze.getPellets()) {
-        		for (Pellet pellet : line) {
-        			if (pellet != null)
-        				pellet.draw(brush);
-        		}
-        	}
-        }
+		brush.setColor(Color.blue);
+		if (currentMaze != null) {
+			currentMaze.draw(brush);
+			if (Application.debug)
+				currentMaze.drawDebug(brush);
+			
+			brush.setColor(Color.white);
+			for (Pellet[] line : currentMaze.getPellets()) {
+				for (Pellet pellet : line) {
+					if (pellet != null)
+						pellet.draw(brush);
+				}
+			}
+		}
 
-        brush.setColor(Color.white);
-        this.actors.forEach((actor) -> {
-        	actor.draw(brush);
-        	if (Application.debug)
-        		actor.drawDebug(brush);
-        });
-        
-        brush.setFont(new Font("arial", Font.BOLD, 16));
-        brush.drawString("Score : "+Application.getPlayer().getScore(), 8, getHeight()-8);
+		brush.setColor(Color.white);
+		this.actors.forEach((actor) -> {
+			actor.draw(brush);
+			if (Application.debug)
+				actor.drawDebug(brush);
+		});
+		
+		brush.setFont(new Font("arial", Font.BOLD, 16));
+		brush.drawString("Score : "+Application.getPlayer().getScore(), 8, getHeight()-8);
 	}
 	
 	public void act(double delta) {
