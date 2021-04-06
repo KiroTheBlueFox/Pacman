@@ -10,7 +10,7 @@ import pacman.game.maze.pellets.Pellet;
 import pacman.game.maze.pellets.PowerPellet;
 
 public class ClassicMaze extends Maze {
-	private static final int PELLET_SIZE = 4, PELLET_SCORE = 1, POWER_PELLET_SIZE = 16, POWER_PELLET_SCORE = 10;
+	private static final int PELLET_SIZE = 4, PELLET_SCORE = 10, POWER_PELLET_SIZE = 16, POWER_PELLET_SCORE = 50;
 
 	public ClassicMaze() {
 		super(448, 496, 16, 224, 376);
@@ -19,7 +19,7 @@ public class ClassicMaze extends Maze {
 	@Override
 	public void draw(Graphics2D brush) {
 		try {
-			brush.drawImage(ImageIO.read(new File("assets/maze.png")), 0, 0, null);
+			brush.drawImage(ImageIO.read(new File("assets/classicmaze/maze.png")), 0, 0, null);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

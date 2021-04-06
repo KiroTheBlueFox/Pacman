@@ -18,6 +18,7 @@ public class Pellet {
 		this.size = size;
 		this.maze = maze;
 		this.score = score;
+		maze.addPellet();
 	}
 	
 	public void draw(Graphics2D brush) {
@@ -26,14 +27,12 @@ public class Pellet {
 	
 	public void act(PacMan player, double delta) {
 		player.addScore(score);
-		if (highPitch) {
-			if (!Clips.munch1.isActive()) {
-				if (Application.playSound(Clips.munch2, false))
+		if (!Clips.powerPellet.isActive()) {
+			if (highPitch) {
+				if (Application.playSound(Clips.munch2, 1, true))
 					highPitch = false;
-			}
-		} else {
-			if (!Clips.munch2.isActive()) {
-				if (Application.playSound(Clips.munch1, false))
+			} else {
+				if (Application.playSound(Clips.munch1, 1, true))
 					highPitch = true;
 			}
 		}

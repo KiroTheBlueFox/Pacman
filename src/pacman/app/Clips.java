@@ -19,10 +19,13 @@ public class Clips {
 		try {
 			munch1 = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
 			munch1.open(AudioSystem.getAudioInputStream(new File("assets/sounds/munch_1.wav")));
+			
 			munch2 = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
 			munch2.open(AudioSystem.getAudioInputStream(new File("assets/sounds/munch_2.wav")));
+			
 			powerPellet = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
 			powerPellet.open(AudioSystem.getAudioInputStream(new File("assets/sounds/power_pellet.wav")));
+			
 			move1 = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
 			move1.open(AudioSystem.getAudioInputStream(new File("assets/sounds/siren_1.wav")));
 		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {

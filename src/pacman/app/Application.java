@@ -52,19 +52,19 @@ public class Application {
     	game.addActor(player);
 	}
     
-	public static synchronized boolean playSound(Clip clip, boolean force) {
+	public static synchronized boolean playSound(Clip clip, int times, boolean force) {
 		if (force || !clip.isActive()) {
 			clip.stop();
 			FloatControl gainControl = ((FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN));
 			float range = gainControl.getMaximum() - gainControl.getMinimum();
 			float gain = (range * 0.8f) + gainControl.getMinimum();
 			gainControl.setValue(gain);
-			clip.loop(1);
+			clip.loop(times);
 			return true;
 		}
 		return false;
 	}
-
+	
 	public static void stopSound(Clip clip) {
 		clip.stop();
 	}

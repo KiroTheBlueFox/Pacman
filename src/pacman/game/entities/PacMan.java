@@ -9,7 +9,7 @@ import pacman.game.maze.pellets.Pellet;
 import pacman.utils.Direction;
 
 public class PacMan extends Entity {
-	private static int MIN_ANGLE = 270, MAX_ANGLE = 360, ANIM_SPEED = 1000, SPEED = 90;
+	private static int MIN_ANGLE = 270, MAX_ANGLE = 360, ANIM_SPEED = 1000, SPEED = 96;
 	private static float SIZE = 1.5f;
 	private int angle, score;
 	private boolean animationForward;
@@ -52,7 +52,6 @@ public class PacMan extends Entity {
 		if (direction != null) {
 			float distance = game.isEnoughSpaceInDirection(this, direction, (float) (delta*SPEED));
 			if (distance < 0) {
-				Application.playSound(Clips.move1, false);
 				switch (direction) {
 				case DOWN:
 					this.move(0, (float) (delta*SPEED));
@@ -69,7 +68,6 @@ public class PacMan extends Entity {
 				}
 			} else {
 				if (distance > 0) {
-					Application.playSound(Clips.move1, false);
 					switch (direction) {
 					case DOWN:
 						this.move(0, distance);
@@ -94,6 +92,10 @@ public class PacMan extends Entity {
 				if (pellet != null) {
 					pellet.act(this, delta);
 					game.getCurrentMaze().getPellets()[(int) ((x+width/2)/(float) game.getCurrentMaze().getTileSize())][(int) ((y+height/2)/(float) game.getCurrentMaze().getTileSize())] = null;
+					game.getCurrentMaze().removePellet();
+					if (game.getCurrentMaze().getPelletCount() <= 0) {
+						System.out.println("All pellets were eaten !");
+					}
 				}
 			} catch (ArrayIndexOutOfBoundsException e) {}
 			/*List<Pellet> tmpPellets = new ArrayList<Pellet>(game.getCurrentMaze().getPellets());
@@ -123,6 +125,14 @@ public class PacMan extends Entity {
 			this.angle -= delta*ANIM_SPEED;
 			if (this.angle <= MIN_ANGLE)
 				this.animationForward = true;
+		}
+	}
+	
+	@Override
+	public void move(float x, float y) {
+		super.move(x, y);
+		if (!Clips.powerPellet.isActive()) {
+			Application.playSound(Clips.move1, 1, false);
 		}
 	}
 	

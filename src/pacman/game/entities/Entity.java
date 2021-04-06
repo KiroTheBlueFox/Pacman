@@ -50,6 +50,10 @@ public abstract class Entity {
 		return y;
 	}
 	
+	public Game getGame() {
+		return game;
+	}
+	
 	public float getWidth() {
 		return width;
 	}

@@ -22,6 +22,6 @@ public class PowerPellet extends Pellet {
 	@Override
 	public void act(PacMan player, double delta) {
 		player.addScore(score);
-		Application.playSound(Clips.powerPellet, false);
+		Application.playSound(Clips.powerPellet, 4, false);
 	}
 }

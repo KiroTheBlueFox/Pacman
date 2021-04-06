@@ -11,7 +11,7 @@ public abstract class Maze {
 	protected boolean[][] walls;
 	protected Pellet[][] pellets;
 	protected List<Rectangle> ghostZones;
-	protected int width, height, tileSize, playerSpawnX, playerSpawnY;
+	protected int width, height, tileSize, playerSpawnX, playerSpawnY, pelletCount;
 	
 	public Maze(int width, int height, int tileSize, int playerSpawnX, int playerSpawnY) {
 		walls = new boolean[width/tileSize][height/tileSize];
@@ -22,6 +22,7 @@ public abstract class Maze {
 		this.tileSize = tileSize;
 		this.playerSpawnX = playerSpawnX;
 		this.playerSpawnY = playerSpawnY;
+		this.pelletCount = 0;
 		initWalls();
 		initPellets();
 		initGhostZones();
@@ -61,6 +62,18 @@ public abstract class Maze {
 	protected abstract void initWalls();
 	protected abstract void initPellets();
 	protected abstract void initGhostZones();
+	
+	public int getPelletCount() {
+		return pelletCount;
+	}
+	
+	public void addPellet() {
+		this.pelletCount++;
+	}
+	
+	public void removePellet() {
+		this.pelletCount--;
+	}
 	
 	public boolean[][] getWalls() {
 		return walls;
