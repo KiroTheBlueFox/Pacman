@@ -2,28 +2,23 @@ package pacman.game.entities;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.ArrayList;
-import java.util.List;
 
 import pacman.app.Application;
 import pacman.app.Clips;
 import pacman.game.maze.pellets.Pellet;
-import pacman.game.maze.pellets.PowerPellet;
 import pacman.utils.Direction;
 
 public class PacMan extends Entity {
-	private static int MIN_ANGLE = 270, MAX_ANGLE = 360, ANIM_SPEED = 1000, SPEED = 120, RANGE_OF_EATING = 2;
-	private static float SPEED_PER_FRAME, SIZE = 0.75f;
+	private static int MIN_ANGLE = 270, MAX_ANGLE = 360, ANIM_SPEED = 1000, SPEED = 90;
+	private static float SIZE = 1.5f;
 	private int angle, score;
 	private boolean animationForward;
-	private Direction direction, nextDirection;
+	private Direction nextDirection;
 	
 	public PacMan(int x, int y) {
-		super("pacman", x, y, 32, 32);
-		this.direction = null;
+		super("pacman", x, y, 16, 16);
 		this.angle = MIN_ANGLE;
 		this.score = 0;
-		SPEED_PER_FRAME = (float) SPEED/(float) Application.FPS;
 	}
 
 	@Override
@@ -47,7 +42,7 @@ public class PacMan extends Entity {
 		super.act(delta);
 
 		if (nextDirection != null) {
-			if (nextDirection != direction && game.isEnoughSpaceInDirection(this, nextDirection, SPEED_PER_FRAME) < 0) {
+			if (nextDirection != direction && game.isEnoughSpaceInDirection(this, nextDirection, (float) (delta*SPEED)) < 0) {
 				direction = nextDirection;
 			}
 		} else {
@@ -55,21 +50,21 @@ public class PacMan extends Entity {
 		}
 		
 		if (direction != null) {
-			float distance = game.isEnoughSpaceInDirection(this, direction, SPEED_PER_FRAME);
+			float distance = game.isEnoughSpaceInDirection(this, direction, (float) (delta*SPEED));
 			if (distance < 0) {
 				Application.playSound(Clips.move1, false);
 				switch (direction) {
 				case DOWN:
-					this.move(0, SPEED_PER_FRAME);
+					this.move(0, (float) (delta*SPEED));
 					break;
 				case LEFT:
-					this.move(-SPEED_PER_FRAME, 0);
+					this.move((float) (-delta*SPEED), 0);
 					break;
 				case RIGHT:
-					this.move(SPEED_PER_FRAME, 0);
+					this.move((float) (delta*SPEED), 0);
 					break;
 				case UP:
-					this.move(0, -SPEED_PER_FRAME);
+					this.move(0, (float) (-delta*SPEED));
 					break;
 				}
 			} else {
@@ -94,7 +89,14 @@ public class PacMan extends Entity {
 					direction = null;
 				}
 			}
-			List<Pellet> tmpPellets = new ArrayList<Pellet>(game.getCurrentMaze().getPellets());
+			try {
+				Pellet pellet = game.getCurrentMaze().getPellets()[(int) ((x+width/2)/(float) game.getCurrentMaze().getTileSize())][(int) ((y+height/2)/(float) game.getCurrentMaze().getTileSize())];
+				if (pellet != null) {
+					pellet.act(this, delta);
+					game.getCurrentMaze().getPellets()[(int) ((x+width/2)/(float) game.getCurrentMaze().getTileSize())][(int) ((y+height/2)/(float) game.getCurrentMaze().getTileSize())] = null;
+				}
+			} catch (ArrayIndexOutOfBoundsException e) {}
+			/*List<Pellet> tmpPellets = new ArrayList<Pellet>(game.getCurrentMaze().getPellets());
 			for (Pellet pellet : tmpPellets) {
 				if (Math.abs(this.x+this.width/2-pellet.getX()) < RANGE_OF_EATING &&
 						Math.abs(this.y+this.height/2-pellet.getY()) < RANGE_OF_EATING) {
@@ -110,7 +112,7 @@ public class PacMan extends Entity {
 					powerPellet.act(this, delta);
 					game.getCurrentMaze().getPowerPellets().remove(powerPellet);
 				}
-			}
+			}*/
 		}
 		
 		if (animationForward) {
@@ -124,12 +126,9 @@ public class PacMan extends Entity {
 		}
 	}
 	
+	@Override
 	public void setDirection(Direction direction) {
 		this.nextDirection = direction;
-	}
-	
-	public Direction getDirection() {
-		return direction;
 	}
 	
 	public int getScore() {

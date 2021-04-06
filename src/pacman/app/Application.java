@@ -15,18 +15,19 @@ import pacman.game.maze.Maze;
 public class Application {
 	private static Game game;
 	private static PacMan player;
+	private static JFrame window;
 	public static int FPS = 60;
 	public static boolean debug = false;
 	
     public static void main(String[] args) {
     	Clips.initClips();
     	
-        JFrame window = new JFrame();
+        window = new JFrame();
         
         game = new Game();
         window.add(game);
 
-        window.setSize(465, 568);
+        window.setSize(464, 568);
 
         window.setTitle("Pac-Man");
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -47,7 +48,7 @@ public class Application {
     	Maze maze = new ClassicMaze();
 		game.setCurrentMaze(maze);
         
-        player = new PacMan(maze.getPlayerSpawnX(), maze.getPlayerSpawnY());
+        player = new PacMan(maze.getPlayerSpawnX()-8, maze.getPlayerSpawnY()-8);
     	game.addActor(player);
 	}
     
@@ -74,5 +75,10 @@ public class Application {
     
     public static PacMan getPlayer() {
 		return player;
+	}
+    
+    public static void close() {
+    	window.dispose();
+    	System.exit(0);
 	}
 }

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +13,7 @@ import javax.swing.JPanel;
 import pacman.app.Application;
 import pacman.game.entities.Entity;
 import pacman.game.maze.Maze;
+import pacman.game.maze.pellets.Pellet;
 import pacman.utils.Direction;
 
 public class Game extends JPanel {
@@ -45,13 +45,12 @@ public class Game extends JPanel {
         		currentMaze.drawDebug(brush);
         	
     		brush.setColor(Color.white);
-        	currentMaze.getPellets().forEach((pellet) -> {
-        		pellet.draw(brush);
-        	});
-        	
-        	currentMaze.getPowerPellets().forEach((powerPellet) -> {
-        		powerPellet.draw(brush);
-        	});
+        	for (Pellet[] line : currentMaze.getPellets()) {
+        		for (Pellet pellet : line) {
+        			if (pellet != null)
+        				pellet.draw(brush);
+        		}
+        	}
         }
 
         brush.setColor(Color.white);
@@ -100,11 +99,60 @@ public class Game extends JPanel {
 	 * @return Something below 0 if there is enough space<br>The distance otherwise
 	 */
 	public float isEnoughSpaceInDirection(Entity entity, Direction direction, float distance) {
-		float playerLeft = entity.getX(),
-				playerRight = entity.getX()+entity.getWidth(),
-				playerUp = entity.getY(),
-				playerDown = entity.getY()+entity.getHeight();
-		for (Rectangle wall : currentMaze.getWalls()) {
+		float playerX = entity.getX()+entity.getWidth()/2,
+				playerY = entity.getY()+entity.getHeight()/2,
+				x = playerX, y = playerY;
+		switch (direction) {
+		case DOWN:
+			y += distance+entity.getHeight()/2;
+			break;
+		case LEFT:
+			x -= distance+entity.getWidth()/2;
+			break;
+		case RIGHT:
+			x += distance+entity.getWidth()/2;
+			break;
+		case UP:
+			y -= distance+entity.getHeight()/2;
+			break;
+		default:
+			break;
+		}
+		int newX = (int) (x/(float) currentMaze.getTileSize()), newY = (int) (y/(float) currentMaze.getTileSize());
+		if (newX >= 0 && newX < currentMaze.getWalls().length &&
+				newY >= 0 && newY < currentMaze.getWalls()[newX].length) {
+			if (currentMaze.getWalls()[newX][newY]) {
+				switch (direction) {
+				case UP:
+					return entity.getY()-(newY+1)*currentMaze.getTileSize();
+				case DOWN:
+					return newY*currentMaze.getTileSize()-(entity.getY()+entity.getHeight());
+				case LEFT:
+					return entity.getX()-(newX+1)*currentMaze.getTileSize();
+				case RIGHT:
+					return newX*currentMaze.getTileSize()-(entity.getX()+entity.getWidth());
+				}
+				return 0;
+			} else {
+				if (entity.getDirection() != null && entity.getDirection() != direction) {
+					switch (direction) {
+					case DOWN:
+						entity.setX(newX*currentMaze.getTileSize());
+						break;
+					case LEFT:
+						entity.setY(newY*currentMaze.getTileSize());
+						break;
+					case RIGHT:
+						entity.setY(newY*currentMaze.getTileSize());
+						break;
+					case UP:
+						entity.setX(newX*currentMaze.getTileSize());
+						break;
+					}
+				}
+			}
+		}
+		/*for (Rectangle wall : currentMaze.getWalls()) {
 			switch (direction) {
 			case DOWN:
 				if (wall.y < playerDown+distance && wall.y > playerUp+distance &&
@@ -137,7 +185,7 @@ public class Game extends JPanel {
 			default:
 				break;
 			}
-		}
+		}*/
 		return -1;
 	}
 }

@@ -6,35 +6,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pacman.game.maze.pellets.Pellet;
-import pacman.game.maze.pellets.PowerPellet;
 
 public abstract class Maze {
-	protected List<Rectangle> walls;
-	protected List<Pellet> pellets;
-	protected List<PowerPellet> powerPellets;
-	protected Rectangle ghostZone;
-	protected int width, height, playerSpawnX, playerSpawnY;
+	protected boolean[][] walls;
+	protected Pellet[][] pellets;
+	protected List<Rectangle> ghostZones;
+	protected int width, height, tileSize, playerSpawnX, playerSpawnY;
 	
-	public Maze(int width, int height, int playerSpawnX, int playerSpawnY) {
-		walls = new ArrayList<Rectangle>();
-		pellets = new ArrayList<Pellet>();
-		powerPellets = new ArrayList<PowerPellet>();
+	public Maze(int width, int height, int tileSize, int playerSpawnX, int playerSpawnY) {
+		walls = new boolean[width/tileSize][height/tileSize];
+		pellets = new Pellet[width/tileSize][height/tileSize];
+		ghostZones = new ArrayList<Rectangle>();
 		this.width = width;
 		this.height = height;
+		this.tileSize = tileSize;
 		this.playerSpawnX = playerSpawnX;
 		this.playerSpawnY = playerSpawnY;
 		initWalls();
 		initPellets();
-		initPowerPellets();
-		initGhostZone();
+		initGhostZones();
 	}
 	
 	public abstract void draw(Graphics2D brush);
 	
 	public void drawDebug(Graphics2D brush) {
-		this.walls.forEach((wall) -> {
-			brush.drawRect(wall.x, wall.y, wall.width, wall.height);
-		});
+		for (int i = 0; i < walls.length; i++) {
+			for (int j = 0; j < walls[i].length; j++) {
+				if (walls[i][j])
+					brush.fillRect(i*tileSize, j*tileSize, tileSize, tileSize);
+			}
+		}
 	}
 	
 	public int getWidth() {
@@ -43,6 +44,10 @@ public abstract class Maze {
 	
 	public int getHeight() {
 		return height;
+	}
+	
+	public int getTileSize() {
+		return tileSize;
 	}
 	
 	public int getPlayerSpawnX() {
@@ -55,22 +60,17 @@ public abstract class Maze {
 	
 	protected abstract void initWalls();
 	protected abstract void initPellets();
-	protected abstract void initPowerPellets();
-	protected abstract void initGhostZone();
+	protected abstract void initGhostZones();
 	
-	public List<Rectangle> getWalls() {
+	public boolean[][] getWalls() {
 		return walls;
 	}
 	
-	public Rectangle getGhostZone() {
-		return ghostZone;
+	public List<Rectangle> getGhostZones() {
+		return ghostZones;
 	}
 	
-	public List<Pellet> getPellets() {
+	public Pellet[][] getPellets() {
 		return pellets;
-	}
-	
-	public List<PowerPellet> getPowerPellets() {
-		return powerPellets;
 	}
 }

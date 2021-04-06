@@ -29,6 +29,9 @@ public class GameKeyListener implements KeyListener {
 		case KeyEvent.VK_F1:
 			Application.debug = !Application.debug;
 			break;
+		case KeyEvent.VK_ESCAPE:
+			Application.close();
+			break;
 		}
 	}
 

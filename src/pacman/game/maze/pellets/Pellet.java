@@ -21,7 +21,7 @@ public class Pellet {
 	}
 	
 	public void draw(Graphics2D brush) {
-		brush.fillRect(x-size/2, y-size/2, size, size);
+		brush.fillRect(8+x*maze.getTileSize()-size/2, 8+y*maze.getTileSize()-size/2, size, size);
 	}
 	
 	public void act(PacMan player, double delta) {
@@ -49,5 +49,9 @@ public class Pellet {
 	
 	public int getSize() {
 		return size;
+	}
+	
+	public int getScore() {
+		return score;
 	}
 }

@@ -14,9 +14,9 @@ public class PowerPellet extends Pellet {
 	
 	@Override
 	public void draw(Graphics2D brush) {
-		brush.fillRect(x-size/2, y-size/4, size, size/2);
-		brush.fillRect(x-size/4, y-size/2, size/2, size);
-		brush.fillRect(x-size/8*3, y-size/8*3, size/8*6, size/8*6);
+		brush.fillRect(8+x*maze.getTileSize()-size/2, 8+y*maze.getTileSize()-size/4, size, size/2);
+		brush.fillRect(8+x*maze.getTileSize()-size/4, 8+y*maze.getTileSize()-size/2, size/2, size);
+		brush.fillRect(8+x*maze.getTileSize()-size/8*3, 8+y*maze.getTileSize()-size/8*3, size/8*6, size/8*6);
 	}
 	
 	@Override

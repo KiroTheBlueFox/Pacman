@@ -4,11 +4,13 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 import pacman.game.Game;
+import pacman.utils.Direction;
 
 public abstract class Entity {
 	protected String id;
 	protected float x, y, width, height;
 	protected double lifeTime;
+	protected Direction direction;
 	protected Game game;
 	
 	public Entity(String id, int x, int y, int width, int height) {
@@ -17,6 +19,7 @@ public abstract class Entity {
 		this.y = y;
 		this.width = width;
 		this.height = height;
+		this.direction = null;
 		this.lifeTime = 0;
 	}
 	
@@ -55,6 +58,14 @@ public abstract class Entity {
 		return height;
 	}
 	
+	public Direction getDirection() {
+		return direction;
+	}
+	
+	public double getLifeTime() {
+		return lifeTime;
+	}
+	
 	public void setX(float x) {
 		this.x = x;
 	}
@@ -69,6 +80,10 @@ public abstract class Entity {
 	
 	public void setHeight(float height) {
 		this.height = height;
+	}
+	
+	public void setDirection(Direction direction) {
+		this.direction = direction;
 	}
 	
 	public void move(float x, float y) {
