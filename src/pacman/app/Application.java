@@ -1,23 +1,30 @@
 package pacman.app;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.util.Timer;
 
 import javax.sound.sampled.Clip;
 import javax.sound.sampled.FloatControl;
 import javax.swing.JFrame;
 
+import pacman.game.BottomMenu;
 import pacman.game.Game;
 import pacman.game.GameKeyListener;
+import pacman.game.TopMenu;
 import pacman.game.entities.PacMan;
-import pacman.game.maze.HDClassicMaze;
 import pacman.game.maze.Maze;
+import pacman.game.maze.hdclassic.HDClassicMaze;
 
 public class Application {
 	private static Game game;
+	private static TopMenu topMenu;
+	private static BottomMenu bottomMenu;
 	private static PacMan player;
 	private static JFrame window;
 	private static Timer timer;
-	public static int FPS = 60;
+	public final static int FPS = 60;
 	public static boolean debug = false;
 	
 	public static void main(String[] args) {
@@ -25,19 +32,25 @@ public class Application {
 		
 		window = new JFrame();
 		
-		game = new Game();
-		window.add(game);
-
-		window.setSize(464, 568);
+		window.setMinimumSize(new Dimension(480, 663));
 
 		window.setTitle("Pac-Man");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setLocationRelativeTo(null);
-		window.setResizable(false);
+//		window.setResizable(false);
+		window.setBackground(Color.black);
+		
+		game = new Game();
+//		game.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
+		window.add(game);
+		topMenu = new TopMenu();
+		window.add(topMenu, BorderLayout.NORTH);
+		bottomMenu = new BottomMenu();
+		window.add(bottomMenu, BorderLayout.SOUTH);
+		
+		startGame();
 		
 		window.setVisible(true);
-
-		startGame();
 		
 		window.addKeyListener(new GameKeyListener());
 		
@@ -72,6 +85,14 @@ public class Application {
 	
 	public static Game getGame() {
 		return game;
+	}
+	
+	public static TopMenu getTopMenu() {
+		return topMenu;
+	}
+	
+	public static BottomMenu getBottomMenu() {
+		return bottomMenu;
 	}
 	
 	public static PacMan getPlayer() {

@@ -1,4 +1,4 @@
-package pacman.game.maze.pellets;
+package pacman.game.maze.classic.pellets;
 
 import java.awt.Graphics2D;
 

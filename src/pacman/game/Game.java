@@ -1,7 +1,6 @@
 package pacman.game;
 
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -14,17 +13,19 @@ import javax.swing.JPanel;
 import pacman.app.Application;
 import pacman.game.entities.Entity;
 import pacman.game.maze.Maze;
-import pacman.game.maze.pellets.Pellet;
+import pacman.game.maze.classic.pellets.Pellet;
 import pacman.utils.Direction;
 
 public class Game extends JPanel {
 	private static final long serialVersionUID = 1L;
+	private static final int MARGIN = 8;
 	private List<Entity> actors;
 	private Maze currentMaze;
 	private RenderingHints rh;
 
 	public Game() {
 		this.actors = new ArrayList<Entity>(); 
+		this.setBackground(Color.black);
 		
 		rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		rh.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -37,10 +38,14 @@ public class Game extends JPanel {
 		Stroke defaultStroke = brush.getStroke();
 		brush.setRenderingHints(rh);
 		
-		brush.setColor(Color.black);
-		brush.fillRect(0, 0, (int) getWidth(), (int) getHeight());
+//		brush.setColor(Color.black);
+//		brush.fillRect(0, 0, (int) getWidth(), (int) getHeight());
 
 		if (currentMaze != null) {
+			double scale = Math.min((getWidth()-MARGIN*2)/(float) currentMaze.getWidth(), (getHeight()-MARGIN*2)/(float) currentMaze.getHeight());
+			brush.translate((getWidth()-(currentMaze.getWidth()*scale))/2, (getHeight()-(currentMaze.getHeight()*scale))/2);
+			brush.scale(scale, scale);
+			
 			brush.setColor(Color.blue);
 			currentMaze.draw(brush);
 			brush.setStroke(defaultStroke);
@@ -57,22 +62,22 @@ public class Game extends JPanel {
 				}
 			}
 			brush.setStroke(defaultStroke);
-		}
-
-		brush.setColor(Color.white);
-		this.actors.forEach((actor) -> {
-			actor.draw(brush);
-			brush.setStroke(defaultStroke);
-			if (Application.debug) {
-				actor.drawDebug(brush);
-				brush.setStroke(defaultStroke);
-			}
-		});
-		
-		if (Application.getPlayer() != null) {
+			
 			brush.setColor(Color.white);
-			brush.setFont(new Font("arial", Font.BOLD, 16));
-			brush.drawString("Score : "+Application.getPlayer().getScore(), 8, getHeight()-8);
+			this.actors.forEach((actor) -> {
+				actor.draw(brush);
+				brush.setStroke(defaultStroke);
+				if (Application.debug) {
+					actor.drawDebug(brush);
+					brush.setStroke(defaultStroke);
+				}
+			});
+			
+			brush.setColor(Color.black);
+			brush.fillRect((int) (-(getWidth()-(currentMaze.getWidth()))/2), 0, (int) ((getWidth()-(currentMaze.getWidth()))/2), getHeight());
+			brush.fillRect((int) (currentMaze.getWidth()), 0, (int) ((getWidth()-(currentMaze.getWidth()*scale))/2), getHeight());
+			brush.fillRect(0, (int) (-(getHeight()-(currentMaze.getHeight()))/2), getWidth(), (int) ((getHeight()-(currentMaze.getHeight()))/2));
+			brush.fillRect(0, (int) (currentMaze.getHeight()), getWidth(), (int) ((getHeight()-(currentMaze.getHeight()*scale))/2));
 		}
 	}
 	
@@ -101,6 +106,7 @@ public class Game extends JPanel {
 	
 	public void setCurrentMaze(Maze currentMaze) {
 		this.currentMaze = currentMaze;
+		this.setSize(currentMaze.getWidth(), currentMaze.getHeight());
 	}
 
 	/**
@@ -164,40 +170,6 @@ public class Game extends JPanel {
 				}
 			}
 		}
-		/*for (Rectangle wall : currentMaze.getWalls()) {
-			switch (direction) {
-			case DOWN:
-				if (wall.y < playerDown+distance && wall.y > playerUp+distance &&
-						((playerLeft > wall.x && playerLeft < wall.x+wall.width) ||
-						(playerRight > wall.x && playerRight < wall.x+wall.width) ||
-						(playerRight >= wall.x+wall.width && playerLeft <= wall.x)))
-					return wall.y-playerDown;
-				break;
-			case LEFT:
-				if (wall.x+wall.width > playerLeft-distance && wall.x+wall.width < playerRight-distance &&
-						((playerUp > wall.y && playerUp < wall.y+wall.height) ||
-						(playerDown > wall.y && playerDown < wall.y+wall.height) ||
-						(playerDown >= wall.y+wall.height && playerUp <= wall.y)))
-					return playerLeft-(wall.x+wall.width);
-				break;
-			case RIGHT:
-				if (wall.x < playerRight+distance && wall.x > playerLeft+distance &&
-						((playerUp > wall.y && playerUp < wall.y+wall.height) ||
-						(playerDown > wall.y && playerDown < wall.y+wall.height) ||
-						(playerDown >= wall.y+wall.height && playerUp <= wall.y)))
-					return wall.x-playerRight;
-				break;
-			case UP:
-				if (wall.y+wall.height > playerUp-distance && wall.y+wall.height < playerDown-distance &&
-						((playerLeft > wall.x && playerLeft < wall.x+wall.width) ||
-						(playerRight > wall.x && playerRight < wall.x+wall.width) ||
-						(playerRight >= wall.x+wall.width && playerLeft <= wall.x)))
-					return playerUp-(wall.y+wall.height);
-				break;
-			default:
-				break;
-			}
-		}*/
 		return -1;
 	}
 

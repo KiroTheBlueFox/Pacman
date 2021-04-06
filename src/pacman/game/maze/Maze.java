@@ -5,7 +5,7 @@ import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.List;
 
-import pacman.game.maze.pellets.Pellet;
+import pacman.game.maze.classic.pellets.Pellet;
 
 public abstract class Maze {
 	protected boolean[][] walls;

@@ -15,6 +15,8 @@ public class AppRefresher extends TimerTask {
 	public void run() {
 		Game game = Application.getGame();
 		game.repaint();
+		Application.getTopMenu().repaint();
+		Application.getBottomMenu().repaint();
 		long now = System.currentTimeMillis();
 		game.act((now-lastTime)/1000d);
 		this.lastTime = now;

@@ -1,4 +1,4 @@
-package pacman.game.maze.pellets;
+package pacman.game.maze.classic.pellets;
 
 import java.awt.Graphics2D;
 
@@ -23,6 +23,6 @@ public class PowerPellet extends Pellet {
 	public void act(PacMan player, double delta) {
 		player.addScore(score);
 		Application.stopSound(Clips.move1);
-		Application.playSound(Clips.powerPellet, 4, false);
+		Application.playSound(Clips.powerPellet, 3, true);
 	}
 }

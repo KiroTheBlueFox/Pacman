@@ -48,7 +48,7 @@ public enum Direction {
 		}
 	}
 	
-	public float toDegrees() {
+	public int toDegrees() {
 		switch (this) {
 		case UP:
 			return 90;
