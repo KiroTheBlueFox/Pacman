@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,16 +34,20 @@ public class Game extends JPanel {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D brush = (Graphics2D) g.create();
+		Stroke defaultStroke = brush.getStroke();
 		brush.setRenderingHints(rh);
 		
 		brush.setColor(Color.black);
 		brush.fillRect(0, 0, (int) getWidth(), (int) getHeight());
 
-		brush.setColor(Color.blue);
 		if (currentMaze != null) {
+			brush.setColor(Color.blue);
 			currentMaze.draw(brush);
-			if (Application.debug)
+			brush.setStroke(defaultStroke);
+			if (Application.debug) {
 				currentMaze.drawDebug(brush);
+				brush.setStroke(defaultStroke);
+			}
 			
 			brush.setColor(Color.white);
 			for (Pellet[] line : currentMaze.getPellets()) {
@@ -51,17 +56,24 @@ public class Game extends JPanel {
 						pellet.draw(brush);
 				}
 			}
+			brush.setStroke(defaultStroke);
 		}
 
 		brush.setColor(Color.white);
 		this.actors.forEach((actor) -> {
 			actor.draw(brush);
-			if (Application.debug)
+			brush.setStroke(defaultStroke);
+			if (Application.debug) {
 				actor.drawDebug(brush);
+				brush.setStroke(defaultStroke);
+			}
 		});
 		
-		brush.setFont(new Font("arial", Font.BOLD, 16));
-		brush.drawString("Score : "+Application.getPlayer().getScore(), 8, getHeight()-8);
+		if (Application.getPlayer() != null) {
+			brush.setColor(Color.white);
+			brush.setFont(new Font("arial", Font.BOLD, 16));
+			brush.drawString("Score : "+Application.getPlayer().getScore(), 8, getHeight()-8);
+		}
 	}
 	
 	public void act(double delta) {
@@ -187,5 +199,9 @@ public class Game extends JPanel {
 			}
 		}*/
 		return -1;
+	}
+
+	public void close() {
+		currentMaze.close();
 	}
 }

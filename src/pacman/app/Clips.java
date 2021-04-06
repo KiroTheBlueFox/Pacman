@@ -32,4 +32,11 @@ public class Clips {
 			e.printStackTrace();
 		}
 	}
+
+	public static void close() {
+		munch1.close();
+		munch2.close();
+		move1.close();
+		powerPellet.close();
+	}
 }

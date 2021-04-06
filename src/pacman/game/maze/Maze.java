@@ -73,6 +73,13 @@ public abstract class Maze {
 	
 	public void removePellet() {
 		this.pelletCount--;
+		if (this.pelletCount <= 0) {
+			endMaze();
+		}
+	}
+	
+	private void endMaze() {
+		System.out.println("All pellets were eaten !");
 	}
 	
 	public boolean[][] getWalls() {
@@ -86,4 +93,6 @@ public abstract class Maze {
 	public Pellet[][] getPellets() {
 		return pellets;
 	}
+	
+	public abstract void close();
 }

@@ -1,6 +1,7 @@
 package pacman.game.maze;
 
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 
@@ -11,18 +12,20 @@ import pacman.game.maze.pellets.PowerPellet;
 
 public class ClassicMaze extends Maze {
 	private static final int PELLET_SIZE = 4, PELLET_SCORE = 10, POWER_PELLET_SIZE = 16, POWER_PELLET_SCORE = 50;
+	protected Image texture;
 
 	public ClassicMaze() {
 		super(448, 496, 16, 224, 376);
+		try {
+			texture = ImageIO.read(new File("assets/classicmaze/maze.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
 	public void draw(Graphics2D brush) {
-		try {
-			brush.drawImage(ImageIO.read(new File("assets/classicmaze/maze.png")), 0, 0, null);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		brush.drawImage(texture, 0, 0, null);
 	}
 	
 	@Override
@@ -261,5 +264,10 @@ public class ClassicMaze extends Maze {
 	protected void initGhostZones() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public void close() {
+		texture.flush();
 	}
 }

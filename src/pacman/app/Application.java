@@ -9,13 +9,14 @@ import javax.swing.JFrame;
 import pacman.game.Game;
 import pacman.game.GameKeyListener;
 import pacman.game.entities.PacMan;
-import pacman.game.maze.ClassicMaze;
+import pacman.game.maze.HDClassicMaze;
 import pacman.game.maze.Maze;
 
 public class Application {
 	private static Game game;
 	private static PacMan player;
 	private static JFrame window;
+	private static Timer timer;
 	public static int FPS = 60;
 	public static boolean debug = false;
 	
@@ -40,12 +41,12 @@ public class Application {
 		
 		window.addKeyListener(new GameKeyListener());
 		
-		Timer timer = new Timer();
+		timer = new Timer();
 		timer.schedule(new AppRefresher(), 0, 1000/FPS);
 	}
 	
 	private static void startGame() {
-		Maze maze = new ClassicMaze();
+		Maze maze = new HDClassicMaze();
 		game.setCurrentMaze(maze);
 		
 		player = new PacMan(maze.getPlayerSpawnX()-8, maze.getPlayerSpawnY()-8);
@@ -78,7 +79,11 @@ public class Application {
 	}
 	
 	public static void close() {
+		timer.cancel();
+		game.close();
+		game = null;
 		window.dispose();
+		Clips.close();
 		System.exit(0);
 	}
 }

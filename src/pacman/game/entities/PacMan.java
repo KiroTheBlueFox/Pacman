@@ -93,9 +93,6 @@ public class PacMan extends Entity {
 					pellet.act(this, delta);
 					game.getCurrentMaze().getPellets()[(int) ((x+width/2)/(float) game.getCurrentMaze().getTileSize())][(int) ((y+height/2)/(float) game.getCurrentMaze().getTileSize())] = null;
 					game.getCurrentMaze().removePellet();
-					if (game.getCurrentMaze().getPelletCount() <= 0) {
-						System.out.println("All pellets were eaten !");
-					}
 				}
 			} catch (ArrayIndexOutOfBoundsException e) {}
 			/*List<Pellet> tmpPellets = new ArrayList<Pellet>(game.getCurrentMaze().getPellets());
