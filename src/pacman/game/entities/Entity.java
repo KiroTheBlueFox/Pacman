@@ -9,12 +9,11 @@ import pacman.utils.Direction;
 import pacman.utils.Spritesheet;
 
 public abstract class Entity {
-	protected static int IDLE_ANIMATION_INDEX = 0,
+	protected static final int IDLE_ANIMATION_INDEX = 0,
 			DOWN_ANIMATION_INDEX = 1,
 			LEFT_ANIMATION_INDEX = 2,
 			RIGHT_ANIMATION_INDEX = 3,
 			UP_ANIMATION_INDEX = 4;
-	protected static double FRAME_TIME = 0.05;
 	protected double timeSinceLastFrame = 0;
 	protected String id;
 	protected float x, y, width, height;
@@ -63,7 +62,7 @@ public abstract class Entity {
 				break;
 			}
 		}
-		if (timeSinceLastFrame >= FRAME_TIME) {
+		if (timeSinceLastFrame >= spritesheet.getFrameTime()) {
 			timeSinceLastFrame = 0;
 			animationFrame = (animationFrame+1)%spritesheet.getFrameCount(index);
 		}

@@ -1,9 +1,15 @@
 package pacman.game.entities;
 
-import java.awt.Color;
+import pacman.utils.Direction;
+import pacman.utils.Spritesheet;
 
 public class Clyde extends Ghost {
-	public Clyde(int x, int y) {
-		super("clyde", x, y, Color.orange);
+	public Clyde(int x, int y, boolean spawning, Direction spawnDirection) {
+		super("clyde", x, y, new Spritesheet("assets/classicmaze/clyde.png", 0.1, 5, 2, 2, 2, 2, 2), spawning, spawnDirection);
+	}
+	
+	@Override
+	public void act(double delta) {
+		super.act(delta);
 	}
 }

@@ -7,14 +7,14 @@ import pacman.utils.Direction;
 import pacman.utils.Spritesheet;
 
 public class PacMan extends Entity {
-	protected static int DEATH_ANIMATION_INDEX = 5;
-	public static final int SPEED = 96;
+	protected static final int DEATH_ANIMATION_INDEX = 5;
+	public static final int SPEED = 128;
 	private int speed, score, lives;
 	private boolean dead;
 	private Direction nextDirection;
 	
 	public PacMan(int x, int y) {
-		super("pacman", x, y, 16, 16, new Spritesheet("assets/classicmaze/pacman.png", 6, 1, 4, 4, 4, 4, 11));
+		super("pacman", x, y, 16, 16, new Spritesheet("assets/classicmaze/pacman.png", 0.025, 6, 1, 4, 4, 4, 4, 11));
 		this.score = 0;
 		this.lives = 3;
 		this.speed = SPEED;

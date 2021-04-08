@@ -12,10 +12,14 @@ import pacman.game.BottomMenu;
 import pacman.game.Game;
 import pacman.game.GameKeyListener;
 import pacman.game.TopMenu;
+import pacman.game.entities.Blinky;
 import pacman.game.entities.Clyde;
+import pacman.game.entities.Inky;
 import pacman.game.entities.PacMan;
+import pacman.game.entities.Pinky;
 import pacman.game.maze.Maze;
 import pacman.game.maze.classic.ClassicMaze;
+import pacman.utils.Direction;
 
 public class Application {
 	private static Game game;
@@ -64,7 +68,10 @@ public class Application {
 		player = new PacMan(maze.getPlayerSpawnX()-8, maze.getPlayerSpawnY()-8);
 		game.addActor(player);
 		
-		game.addActor(new Clyde(216, 176));
+		game.addActor(new Blinky(216, 176, false, Direction.LEFT));
+		game.addActor(new Inky(184, 224, true, Direction.UP));
+		game.addActor(new Pinky(216, 224, true, Direction.DOWN));
+		game.addActor(new Clyde(248, 224, true, Direction.UP));
 	}
 	
 	public static synchronized boolean playSound(Clips clip1, int times, boolean force) {

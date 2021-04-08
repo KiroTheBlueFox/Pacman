@@ -12,8 +12,9 @@ public class Spritesheet {
 	private BufferedImage fullSheet;
 	private int spriteWidth, spriteHeight, rowCount;
 	private int[] frames;
+	private double frameTime;
 	
-	public Spritesheet(String file, int rowCount, int... frames) {
+	public Spritesheet(String file, double frameTime, int rowCount, int... frames) {
 		if (rowCount == 0) {
 			new InvalidParameterException("rows (second parameter) has to be 1 or higher").printStackTrace();
 			return;
@@ -46,6 +47,7 @@ public class Spritesheet {
 		}
 		spriteWidth = (int) tempSpriteWidth;
 		spriteHeight = (int) tempSpriteHeight;
+		this.frameTime = frameTime;
 		this.rowCount = rowCount;
 		this.frames = frames;
 	}
@@ -68,6 +70,10 @@ public class Spritesheet {
 	
 	public BufferedImage getFullSheet() {
 		return fullSheet;
+	}
+	
+	public double getFrameTime() {
+		return frameTime;
 	}
 
 	public void drawSprite(Graphics2D brush, int x, int y, int animationIndex, int animationFrame) {

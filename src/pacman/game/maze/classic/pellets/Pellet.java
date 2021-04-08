@@ -6,8 +6,11 @@ import pacman.app.Application;
 import pacman.app.Clips;
 import pacman.game.entities.PacMan;
 import pacman.game.maze.Maze;
+import pacman.utils.Spritesheet;
 
 public class Pellet {
+	protected static final int PELLET_ANIMATION_INDEX = 0;
+	protected static Spritesheet spritesheet = new Spritesheet("assets/classicmaze/pellets.png", 0, 2, 1, 1);
 	public static boolean highPitch = true;
 	protected int x, y, size, score;
 	protected Maze maze;
@@ -23,7 +26,7 @@ public class Pellet {
 	
 	public void draw(Graphics2D brush) {
 		brush.setRenderingHints(maze.getGame().noAntialiasingRH);
-		brush.fillRect(8+x*maze.getTileSize()-size/2, 8+y*maze.getTileSize()-size/2, size, size);
+		spritesheet.drawSprite(brush, (int) ((x+0.5f)*maze.getTileSize()), (int) ((y+0.5f)*maze.getTileSize()), PELLET_ANIMATION_INDEX, 0);
 		brush.setRenderingHints(maze.getGame().antialiasingRH);
 	}
 	
