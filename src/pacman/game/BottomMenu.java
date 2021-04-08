@@ -10,7 +10,6 @@ import java.awt.RenderingHints;
 import javax.swing.JPanel;
 
 import pacman.app.Application;
-import pacman.game.entities.PacMan;
 
 public class BottomMenu extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -18,7 +17,7 @@ public class BottomMenu extends JPanel {
 	
 	public BottomMenu() {
 		setPreferredSize(new Dimension(WIDTH, 64));
-		setBackground(Color.black);
+		setBackground(Color.white);
 		
 		rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		rh.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -33,7 +32,7 @@ public class BottomMenu extends JPanel {
 		brush.translate((getWidth()-Application.getGame().getCurrentMaze().getWidth())/2, 0);
 		
 		brush.setColor(Color.yellow);
-		brush.fillArc(8, 8, 48, 48, 45, PacMan.MIN_ANGLE);
+		brush.fillArc(8, 8, 48, 48, 45, 270);
 		
 		brush.setColor(Color.white);
 		brush.setFont(new Font("arial", Font.BOLD, 48));

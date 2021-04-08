@@ -1,10 +1,5 @@
 package pacman.game.maze.hdclassic;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
-
 import pacman.game.maze.classic.ClassicMaze;
 import pacman.game.maze.classic.pellets.Pellet;
 import pacman.game.maze.hdclassic.pellets.HDPellet;
@@ -12,11 +7,8 @@ import pacman.game.maze.hdclassic.pellets.HDPowerPellet;
 
 public class HDClassicMaze extends ClassicMaze {
 	public HDClassicMaze() {
-		try {
-			this.texture = ImageIO.read(new File("assets/classicmaze/mazehd.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		super("assets/hdclassicmaze/");
+		this.texture = loadTextureFromFolder("mazehd.png");
 	}
 
 	@Override

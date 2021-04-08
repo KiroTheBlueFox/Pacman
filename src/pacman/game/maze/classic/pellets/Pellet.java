@@ -18,23 +18,23 @@ public class Pellet {
 		this.size = size;
 		this.maze = maze;
 		this.score = score;
-		maze.addPellet();
+		maze.addPellet(true);
 	}
 	
 	public void draw(Graphics2D brush) {
+		brush.setRenderingHints(maze.getGame().noAntialiasingRH);
 		brush.fillRect(8+x*maze.getTileSize()-size/2, 8+y*maze.getTileSize()-size/2, size, size);
+		brush.setRenderingHints(maze.getGame().antialiasingRH);
 	}
 	
 	public void act(PacMan player, double delta) {
 		player.addScore(score);
-		if (!Clips.powerPellet.isActive()) {
-			if (highPitch) {
-				if (Application.playSound(Clips.munch2, 1, true))
-					highPitch = false;
-			} else {
-				if (Application.playSound(Clips.munch1, 1, true))
-					highPitch = true;
-			}
+		if (highPitch) {
+			if (Application.playSound(Clips.munch2, 1, true))
+				highPitch = false;
+		} else {
+			if (Application.playSound(Clips.munch1, 1, true))
+				highPitch = true;
 		}
 	}
 	

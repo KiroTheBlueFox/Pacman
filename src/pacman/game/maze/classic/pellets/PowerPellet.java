@@ -14,15 +14,16 @@ public class PowerPellet extends Pellet {
 	
 	@Override
 	public void draw(Graphics2D brush) {
+		brush.setRenderingHints(maze.getGame().noAntialiasingRH);
 		brush.fillRect(8+x*maze.getTileSize()-size/2, 8+y*maze.getTileSize()-size/4, size, size/2);
 		brush.fillRect(8+x*maze.getTileSize()-size/4, 8+y*maze.getTileSize()-size/2, size/2, size);
 		brush.fillRect(8+x*maze.getTileSize()-size/8*3, 8+y*maze.getTileSize()-size/8*3, size/8*6, size/8*6);
+		brush.setRenderingHints(maze.getGame().antialiasingRH);
 	}
 	
 	@Override
 	public void act(PacMan player, double delta) {
 		player.addScore(score);
-		Application.stopSound(Clips.move1);
 		Application.playSound(Clips.powerPellet, 3, true);
 	}
 }

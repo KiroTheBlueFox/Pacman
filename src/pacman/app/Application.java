@@ -6,16 +6,16 @@ import java.awt.Dimension;
 import java.util.Timer;
 
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.FloatControl;
 import javax.swing.JFrame;
 
 import pacman.game.BottomMenu;
 import pacman.game.Game;
 import pacman.game.GameKeyListener;
 import pacman.game.TopMenu;
+import pacman.game.entities.Clyde;
 import pacman.game.entities.PacMan;
 import pacman.game.maze.Maze;
-import pacman.game.maze.hdclassic.HDClassicMaze;
+import pacman.game.maze.classic.ClassicMaze;
 
 public class Application {
 	private static Game game;
@@ -24,15 +24,14 @@ public class Application {
 	private static PacMan player;
 	private static JFrame window;
 	private static Timer timer;
-	public final static int FPS = 60;
+	public static final int FPS = 60;
+	public static final float DEFAULT_VOLUME = 0.8f;
 	public static boolean debug = false;
 	
 	public static void main(String[] args) {
-		Clips.initClips();
-		
 		window = new JFrame();
 		
-		window.setMinimumSize(new Dimension(480, 663));
+		window.setMinimumSize(new Dimension(480, 679));
 
 		window.setTitle("Pac-Man");
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,28 +58,35 @@ public class Application {
 	}
 	
 	private static void startGame() {
-		Maze maze = new HDClassicMaze();
+		Maze maze = new ClassicMaze();
 		game.setCurrentMaze(maze);
 		
 		player = new PacMan(maze.getPlayerSpawnX()-8, maze.getPlayerSpawnY()-8);
 		game.addActor(player);
+		
+		game.addActor(new Clyde(216, 176));
 	}
 	
-	public static synchronized boolean playSound(Clip clip, int times, boolean force) {
+	public static synchronized boolean playSound(Clips clip1, int times, boolean force) {
+		Clip clip = clip1.getClip();
 		if (force || !clip.isActive()) {
 			clip.stop();
-			FloatControl gainControl = ((FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN));
-			float range = gainControl.getMaximum() - gainControl.getMinimum();
-			float gain = (range * 0.8f) + gainControl.getMinimum();
-			gainControl.setValue(gain);
 			clip.loop(times);
 			return true;
 		}
 		return false;
 	}
 	
-	public static void stopSound(Clip clip) {
-		clip.stop();
+	public static void stopSound(Clips clip) {
+		clip.getClip().stop();
+		clip.getClip().flush();
+	}
+
+	public static void stopSounds(Clips[] clips) {
+		for (Clips clip : clips) {
+			clip.getClip().stop();
+			clip.getClip().flush();
+		}
 	}
 	
 	public static Game getGame() {
@@ -104,7 +110,7 @@ public class Application {
 		game.close();
 		game = null;
 		window.dispose();
-		Clips.close();
+		Clips.closeClips();
 		System.exit(0);
 	}
 }

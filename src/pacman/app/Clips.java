@@ -5,38 +5,45 @@ import java.io.IOException;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.Line;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
-public class Clips {
-	public static Clip
-	munch1, munch2,
-	move1,
-	powerPellet;
+public enum Clips {
+	munch1("assets/sounds/munch_1.wav"),
+	munch2("assets/sounds/munch_2.wav"),
+	move1("assets/sounds/siren_1.wav"),
+	move2("assets/sounds/siren_2.wav"),
+	move3("assets/sounds/siren_3.wav"),
+	powerPellet("assets/sounds/power_pellet.wav");
+	private Clip clip;
 	
-	public static void initClips() {
+	private Clips(String file) {
 		try {
-			munch1 = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
-			munch1.open(AudioSystem.getAudioInputStream(new File("assets/sounds/munch_1.wav")));
-			
-			munch2 = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
-			munch2.open(AudioSystem.getAudioInputStream(new File("assets/sounds/munch_2.wav")));
-			
-			powerPellet = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
-			powerPellet.open(AudioSystem.getAudioInputStream(new File("assets/sounds/power_pellet.wav")));
-			
-			move1 = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
-			move1.open(AudioSystem.getAudioInputStream(new File("assets/sounds/siren_1.wav")));
+			clip = (Clip) AudioSystem.getLine(new Line.Info(Clip.class));
+			clip.open(AudioSystem.getAudioInputStream(new File(file)));
+			FloatControl gainControl = ((FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN));
+			float range = gainControl.getMaximum() - gainControl.getMinimum();
+			float gain = (range * Application.DEFAULT_VOLUME) + gainControl.getMinimum();
+			gainControl.setValue(gain);
 		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void close() {
-		munch1.close();
-		munch2.close();
-		move1.close();
-		powerPellet.close();
+	public static void closeClips() {
+		for (Clips clip : values()) {
+			clip.getClip().stop();
+			clip.getClip().close();
+		}
+	}
+
+	public Clip getClip() {
+		return clip;
+	}
+
+	public static Clips[] getMoveClips() {
+		return new Clips[] {move1, move2, move3};
 	}
 }

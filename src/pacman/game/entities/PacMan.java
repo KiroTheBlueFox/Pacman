@@ -1,23 +1,20 @@
 package pacman.game.entities;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 
-import pacman.app.Application;
-import pacman.app.Clips;
 import pacman.game.maze.classic.pellets.Pellet;
 import pacman.utils.Direction;
+import pacman.utils.Spritesheet;
 
 public class PacMan extends Entity {
-	public static final int MIN_ANGLE = 270, MAX_ANGLE = 360, ANIM_SPEED = 1000, SPEED = 96;
-	public static final float SIZE = 1.5f;
-	private int speed, angle, score, lives;
-	private boolean animationForward;
+	protected static int DEATH_ANIMATION_INDEX = 5;
+	public static final int SPEED = 96;
+	private int speed, score, lives;
+	private boolean dead;
 	private Direction nextDirection;
 	
 	public PacMan(int x, int y) {
-		super("pacman", x, y, 16, 16);
-		this.angle = MIN_ANGLE;
+		super("pacman", x, y, 16, 16, new Spritesheet("assets/classicmaze/pacman.png", 6, 1, 4, 4, 4, 4, 11));
 		this.score = 0;
 		this.lives = 3;
 		this.speed = SPEED;
@@ -25,17 +22,12 @@ public class PacMan extends Entity {
 
 	@Override
 	public void draw(Graphics2D brush) {
-		brush.setColor(Color.yellow);
-		float widthDifference = width-width*SIZE,
-				heightDifference = height-height*SIZE;
-		int resizedX = Math.round(x+widthDifference/2f),
-			resizedY = Math.round(y+heightDifference/2f);
-		if (direction != null) {
-			int angle = direction.toDegrees();
-			int difference = 360-this.angle;
-			brush.fillArc(resizedX, resizedY, Math.round(width*SIZE), Math.round(height*SIZE), angle+difference/2, this.angle);
+		if (dead) {
+			
 		} else {
-			brush.fillOval(resizedX, resizedY, Math.round(width*SIZE), Math.round(height*SIZE));
+			brush.setRenderingHints(getGame().noAntialiasingRH);
+			super.draw(brush);
+			brush.setRenderingHints(getGame().antialiasingRH);
 		}
 	}
 	
@@ -44,7 +36,7 @@ public class PacMan extends Entity {
 		super.act(delta);
 
 		if (nextDirection != null) {
-			if (nextDirection != direction && game.isEnoughSpaceInDirection(this, nextDirection, (float) (delta*speed)) < 0) {
+			if (nextDirection != direction && game.isEnoughSpaceInDirection(this, nextDirection, (float) (delta*speed*getGame().getSpeed().getSpeedFactor()), false) < 0) {
 				direction = nextDirection;
 			}
 		} else {
@@ -52,20 +44,20 @@ public class PacMan extends Entity {
 		}
 		
 		if (direction != null) {
-			float distance = game.isEnoughSpaceInDirection(this, direction, (float) (delta*speed));
+			float distance = game.isEnoughSpaceInDirection(this, direction, (float) (delta*speed*getGame().getSpeed().getSpeedFactor()), false);
 			if (distance < 0) {
 				switch (direction) {
 				case DOWN:
-					this.move(0, (float) (delta*speed));
+					this.move(0, (float) (delta*speed*getGame().getSpeed().getSpeedFactor()));
 					break;
 				case LEFT:
-					this.move((float) (-delta*speed), 0);
+					this.move((float) (-delta*speed*getGame().getSpeed().getSpeedFactor()), 0);
 					break;
 				case RIGHT:
-					this.move((float) (delta*speed), 0);
+					this.move((float) (delta*speed*getGame().getSpeed().getSpeedFactor()), 0);
 					break;
 				case UP:
-					this.move(0, (float) (-delta*speed));
+					this.move(0, (float) (-delta*speed*getGame().getSpeed().getSpeedFactor()));
 					break;
 				}
 			} else {
@@ -85,7 +77,6 @@ public class PacMan extends Entity {
 						break;
 					}
 				} else {
-					Application.stopSound(Clips.move1);
 					direction = null;
 				}
 			}
@@ -98,29 +89,19 @@ public class PacMan extends Entity {
 				}
 			} catch (ArrayIndexOutOfBoundsException e) {}
 		}
-		
-		if (animationForward) {
-			this.angle += delta*ANIM_SPEED;
-			if (this.angle >= MAX_ANGLE)
-				this.animationForward = false;
-		} else {
-			this.angle -= delta*ANIM_SPEED;
-			if (this.angle <= MIN_ANGLE)
-				this.animationForward = true;
-		}
 	}
 	
 	@Override
 	public void move(float x, float y) {
 		super.move(x, y);
-		if (!Clips.powerPellet.isActive()) {
-			Application.playSound(Clips.move1, 1, false);
-		}
 	}
 	
 	@Override
 	public void setDirection(Direction direction) {
-		this.nextDirection = direction;
+		if (direction != nextDirection && direction != this.direction) {
+			this.animationFrame = 0;
+			this.nextDirection = direction;
+		}
 	}
 	
 	public int getScore() {

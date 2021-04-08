@@ -2,10 +2,6 @@ package pacman.game.maze.classic;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.io.File;
-import java.io.IOException;
-
-import javax.imageio.ImageIO;
 
 import pacman.game.maze.Maze;
 import pacman.game.maze.classic.pellets.Pellet;
@@ -16,17 +12,21 @@ public class ClassicMaze extends Maze {
 	protected Image texture;
 
 	public ClassicMaze() {
-		super(448, 496, 16, 224, 376);
-		try {
-			texture = ImageIO.read(new File("assets/classicmaze/maze.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		super(448, 496, 16, 224, 376, "assets/classicmaze/");
+		texture = loadTextureFromFolder("maze.png");
+	}
+	
+	protected ClassicMaze(String folder) {
+		super(448, 496, 16, 224, 376, folder);
 	}
 	
 	@Override
 	public void draw(Graphics2D brush) {
-		brush.drawImage(texture, 0, 0, null);
+		if (texture != null) {
+			brush.setRenderingHints(getGame().noAntialiasingRH);
+			brush.drawImage(texture, 0, 0, null);
+			brush.setRenderingHints(getGame().antialiasingRH);
+		}
 	}
 	
 	@Override
