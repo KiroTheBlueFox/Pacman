@@ -3,7 +3,10 @@ package pacman.game.maze.classic;
 import java.awt.Graphics2D;
 import java.awt.Image;
 
+import pacman.game.entities.Blinky;
 import pacman.game.entities.Clyde;
+import pacman.game.entities.Inky;
+import pacman.game.entities.Pinky;
 import pacman.game.maze.Maze;
 import pacman.game.maze.classic.pellets.Pellet;
 import pacman.game.maze.classic.pellets.PowerPellet;
@@ -99,12 +102,12 @@ public class ClassicMaze extends Maze {
 
 	@Override
 	protected void initGhosts() {
-//		game.addActor(new Blinky(ghostSpawnX, ghostSpawnY, tileSize, tileSize, false, Direction.LEFT));
+		game.addActor(new Blinky(ghostSpawnX, ghostSpawnY, tileSize, tileSize, false, Direction.LEFT));
 //		game.addActor(new Inky(11, 14, tileSize, tileSize, true, Direction.UP));
 //		game.addActor(new Pinky(13, 14, tileSize, tileSize, true, Direction.DOWN));
 //		game.addActor(new Clyde(15, 14, tileSize, tileSize, true, Direction.UP));
-//		game.addActor(new Inky(ghostSpawnX, ghostSpawnY, tileSize, tileSize, false, Direction.LEFT));
-//		game.addActor(new Pinky(ghostSpawnX, ghostSpawnY, tileSize, tileSize, false, Direction.LEFT));
+		game.addActor(new Inky(ghostSpawnX, ghostSpawnY, tileSize, tileSize, false, Direction.LEFT));
+		game.addActor(new Pinky(ghostSpawnX, ghostSpawnY, tileSize, tileSize, false, Direction.LEFT));
 		game.addActor(new Clyde(ghostSpawnX, ghostSpawnY, tileSize, tileSize, false, Direction.LEFT));
 	}
 
