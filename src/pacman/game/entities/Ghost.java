@@ -21,7 +21,7 @@ public class Ghost extends Entity {
 	public void act(double delta) {
 		super.act(delta);
 		
-		if (direction != null) {
+		if (direction != null && !spawning) {
 			float distance = game.isEnoughSpaceInDirection(this, direction, (float) (delta*speed*getGame().getSpeed().getSpeedFactor()), false);
 			if (distance < 0) {
 				int newX = (int) ((x+width/2)/(float) game.getCurrentMaze().getTileSize()),
