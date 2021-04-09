@@ -13,11 +13,16 @@ import pacman.game.maze.classic.pellets.Pellet;
 import pacman.game.maze.special.GhostZone;
 
 public abstract class Maze {
-	protected static final String DEFAULT_MAP = "map.png", DEFAULT_PELLET_MAP = "pelletsmap.png";
+	protected static final String DEFAULT_MAP = "map.png", DEFAULT_PELLET_MAP = "pelletsmap.png",
+			DEFAULT_RESTRICTION_MAP = "restrictionsmap.png";
 	protected static final int DEFAULT_WALL_COLOR = 0xFFFFFFFF, DEFAULT_PATH_COLOR = 0xFF000000,
 			DEFAULT_NO_PELLET_COLOR = 0xFFFFFFFF, DEFAULT_PELLET_COLOR = 0xFF000000,
-			DEFAULT_POWER_PELLET_COLOR = 0xFF0000FF;
+			DEFAULT_POWER_PELLET_COLOR = 0xFF0000FF,
+			DEFAULT_NO_RESTRICTION_COLOR = 0xFFFFFFFF, DEFAULT_MOVEMENT_RESTRICTION_COLOR = 0xFF000000,
+			DEFAULT_SPEED_RESTRICTION_COLOR = 0xFF0000FF;
 	protected boolean[][] walls;
+	protected boolean[][] movementRestrictionZones;
+	protected boolean[][] speedRestrictionZones;
 	protected Pellet[][] pellets;
 	protected GhostZone ghostZone;
 	protected int width, height, tileSize, playerSpawnX, playerSpawnY, ghostSpawnX, ghostSpawnY, pelletCount,
@@ -27,8 +32,10 @@ public abstract class Maze {
 
 	public Maze(int width, int height, int tileSize, int playerSpawnX, int playerSpawnY, int ghostSpawnX,
 			int ghostSpawnY, String folder) {
-		walls = new boolean[width / tileSize][height / tileSize];
-		pellets = new Pellet[width / tileSize][height / tileSize];
+		this.walls = new boolean[width / tileSize][height / tileSize];
+		this.pellets = new Pellet[width / tileSize][height / tileSize];
+		this.movementRestrictionZones = new boolean[width / tileSize][height / tileSize];
+		this.speedRestrictionZones = new boolean[width / tileSize][height / tileSize];
 		this.width = width;
 		this.height = height;
 		this.tileSize = tileSize;
@@ -43,6 +50,7 @@ public abstract class Maze {
 		}
 		initWalls();
 		initPellets();
+		initRestrictionZones();
 		initGhostZone();
 	}
 
@@ -109,6 +117,8 @@ public abstract class Maze {
 	protected abstract void initWalls();
 
 	protected abstract void initPellets();
+	
+	protected abstract void initRestrictionZones();
 
 	protected abstract void initGhostZone();
 
@@ -152,13 +162,21 @@ public abstract class Maze {
 	public boolean[][] getWalls() {
 		return walls;
 	}
+	
+	public Pellet[][] getPellets() {
+		return pellets;
+	}
+	
+	public boolean[][] getMovementRestrictionZones() {
+		return speedRestrictionZones;
+	}
+	
+	public boolean[][] getSpeedRestrictionZones() {
+		return speedRestrictionZones;
+	}
 
 	public GhostZone getGhostZone() {
 		return ghostZone;
-	}
-
-	public Pellet[][] getPellets() {
-		return pellets;
 	}
 
 	public abstract void close();

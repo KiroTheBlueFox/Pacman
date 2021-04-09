@@ -20,7 +20,7 @@ public abstract class Entity {
 	protected Spritesheet spritesheet;
 	protected Game game;
 
-	public Entity(String id, int x, int y, int width, int height, Spritesheet defaultSpritesheet) {
+	public Entity(String id, int x, int y, int width, int height, Direction spawnDirection, Spritesheet defaultSpritesheet) {
 		this.id = id;
 		this.x = x;
 		this.oldX = x;
@@ -28,7 +28,21 @@ public abstract class Entity {
 		this.oldY = y;
 		this.width = width;
 		this.height = height;
-		this.direction = null;
+		this.direction = spawnDirection;
+		switch (this.direction) {
+		case DOWN:
+			this.oldY--;
+			break;
+		case LEFT:
+			this.oldX++;
+			break;
+		case RIGHT:
+			this.oldX--;
+			break;
+		case UP:
+			this.oldY++;
+			break;
+		}
 		this.lifeTime = 0;
 		this.lastTime = 0;
 		this.timeSinceLastFrame = 0;
@@ -97,8 +111,6 @@ public abstract class Entity {
 
 	public void drawDebug(Graphics2D brush) {
 		brush.setColor(Color.black);
-		brush.drawRect(Math.round(x * game.getCurrentMaze().getTileSize()),
-				Math.round(y * game.getCurrentMaze().getTileSize()), Math.round(width), Math.round(height));
 		brush.setRenderingHints(game.antialiasingRH);
 		brush.fillOval((int) getCenterX() - 1, (int) getCenterY() - 1, 2, 2);
 		brush.setRenderingHints(game.noAntialiasingRH);
@@ -122,20 +134,12 @@ public abstract class Entity {
 		return x;
 	}
 
-	public int getGridX() {
-		return (int) x;
-	}
-
 	public float getCenterX() {
 		return (x * game.getCurrentMaze().getTileSize()) + width / 2f;
 	}
 
 	public int getY() {
 		return y;
-	}
-
-	public int getGridY() {
-		return (int) y;
 	}
 
 	public float getCenterY() {
@@ -192,14 +196,14 @@ public abstract class Entity {
 		this.y += y;
 		int maxWidth = game.getCurrentMaze().getWidth()/game.getCurrentMaze().getTileSize();
 		int maxHeight = game.getCurrentMaze().getHeight()/game.getCurrentMaze().getTileSize();
-		if (this.x > maxWidth) {
-			this.x = -this.width;
-		} else if (this.x < -this.width) {
+		if (this.x >= maxWidth) {
+			this.x = -1;
+		} else if (this.x < 0) {
 			this.x = maxWidth;
 		}
-		if (this.y > maxHeight) {
-			this.y = -this.height;
-		} else if (this.y < -this.height) {
+		if (this.y >= maxHeight) {
+			this.y = -1;
+		} else if (this.y < 0) {
 			this.y = maxHeight;
 		}
 		Application.playSound(getGame().getSpeed().getMovementClip(), 1, false);

@@ -14,6 +14,7 @@ import pacman.app.Application;
 import pacman.app.Clips;
 import pacman.game.api.GameSpeed;
 import pacman.game.entities.Entity;
+import pacman.game.entities.Ghost;
 import pacman.game.maze.Maze;
 import pacman.game.maze.classic.pellets.Pellet;
 import pacman.utils.Direction;
@@ -130,6 +131,24 @@ public class Game extends JPanel {
 	public List<Entity> getActors() {
 		return actors;
 	}
+	
+	public Ghost getGhostById(String id) {
+		for (Entity actor : actors) {
+			if (actor.getId().contentEquals(id) && actor instanceof Ghost) {
+				return (Ghost) actor;
+			}
+		}
+		return null;
+	}
+	
+	public Entity getActorById(String id) {
+		for (Entity actor : actors) {
+			if (actor.getId().contentEquals(id)) {
+				return actor;
+			}
+		}
+		return null;
+	}
 
 	public Maze getCurrentMaze() {
 		return currentMaze;
@@ -159,7 +178,7 @@ public class Game extends JPanel {
 			}
 			return isEnoughSpaceInDirection(entity, direction, distance, true);
 		} else {
-			int x = entity.getGridX(), y = entity.getGridY();
+			int x = entity.getX(), y = entity.getY();
 			switch (direction) {
 			case DOWN:
 				y += distance;

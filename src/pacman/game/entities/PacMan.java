@@ -9,14 +9,14 @@ import pacman.utils.Spritesheet;
 
 public class PacMan extends Entity {
 	protected static final int DEATH_ANIMATION_INDEX = 5;
-	public static final float SPEED = 0.15f;
+	public static final float SPEED = 0.132f;
 	private int score, lives;
 	private boolean dead;
 	private Direction nextDirection;
 
-	public PacMan(int x, int y, int width, int height) {
-		super("pacman", x, y, width, height,
-				new Spritesheet("assets/classicmaze/pacman.png", 0.05, 6, 1, 4, 4, 4, 4, 11));
+	public PacMan(int x, int y, int width, int height, Direction spawnDirection) {
+		super("pacman", x, y, width, height, spawnDirection,
+				new Spritesheet("assets/classicmaze/pacman.png", 0.04, 6, 1, 4, 4, 4, 4, 11));
 		this.score = 0;
 		this.lives = 3;
 		this.speed = SPEED;
@@ -24,45 +24,51 @@ public class PacMan extends Entity {
 
 	@Override
 	public void draw(Graphics2D brush) {
+		float centerX = getCenterX(), centerY = getCenterY();
 		if (dead) {
-
+			spritesheet.drawSprite(brush, (int) centerX, (int) centerY, IDLE_ANIMATION_INDEX,
+					animationFrame % spritesheet.getFrameCount(IDLE_ANIMATION_INDEX));
 		} else {
 			brush.setRenderingHints(getGame().noAntialiasingRH);
-			float centerX = getCenterX(), centerY = getCenterY(),
-					offset = (float) (MathUtils.normalize(lastTime, speed)-0.5)*game.getCurrentMaze().getTileSize();
+			float offset = (float) (MathUtils.normalize(lastTime, speed)-0.5)*game.getCurrentMaze().getTileSize();
 			int index = IDLE_ANIMATION_INDEX;
 			if (direction == null) {
 				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, IDLE_ANIMATION_INDEX,
 						animationFrame % spritesheet.getFrameCount(IDLE_ANIMATION_INDEX));
 			} else {
+				Direction offsetDirection = direction;
 				if (offset > 0 &&
 						!game.isEnoughSpaceInDirection(this, direction, 1, false) &&
 						!game.isEnoughSpaceInDirection(this, nextDirection, 1, false)) {
 					offset = 0;
+					offsetDirection = null;
 				}
-				Direction offsetDirection = direction;
 				if (offset < 0) {
 					offsetDirection = Direction.fromAtoB(oldX, oldY, x, y);
 				} else if (game.isEnoughSpaceInDirection(this, nextDirection, 1, false)) {
 					offsetDirection = nextDirection;
 				}
-				switch (offsetDirection) {
-				case DOWN:
-					index = DOWN_ANIMATION_INDEX;
-					centerY += offset;
-					break;
-				case LEFT:
-					index = LEFT_ANIMATION_INDEX;
-					centerX -= offset;
-					break;
-				case RIGHT:
-					index = RIGHT_ANIMATION_INDEX;
-					centerX += offset;
-					break;
-				case UP:
-					index = UP_ANIMATION_INDEX;
-					centerY -= offset;
-					break;
+				if (offsetDirection == null) {
+					index = IDLE_ANIMATION_INDEX;
+				} else {
+					switch (offsetDirection) {
+					case DOWN:
+						index = DOWN_ANIMATION_INDEX;
+						centerY += offset;
+						break;
+					case LEFT:
+						index = LEFT_ANIMATION_INDEX;
+						centerX -= offset;
+						break;
+					case RIGHT:
+						index = RIGHT_ANIMATION_INDEX;
+						centerX += offset;
+						break;
+					case UP:
+						index = UP_ANIMATION_INDEX;
+						centerY -= offset;
+						break;
+					}
 				}
 				switch (direction) {
 				case DOWN:
@@ -141,12 +147,17 @@ public class PacMan extends Entity {
 
 	@Override
 	public void setDirection(Direction direction) {
-		if (direction != nextDirection && direction != this.direction) {
-			if (this.direction == null) {
-				this.lastTime = speed/getGame().getSpeed().getSpeedFactor();
-			}
-			this.animationFrame = 0;
+		if (game == null) {
+			this.direction = direction;
 			this.nextDirection = direction;
+		} else {
+			if (direction != nextDirection && direction != this.direction) {
+				if (this.direction == null) {
+					this.lastTime = speed/getGame().getSpeed().getSpeedFactor();
+				}
+				this.animationFrame = 0;
+				this.nextDirection = direction;
+			}
 		}
 	}
 
@@ -176,5 +187,13 @@ public class PacMan extends Entity {
 
 	public int getLives() {
 		return lives;
+	}
+
+	public Direction getLastDirection() {
+		if (direction == null) {
+			return Direction.fromAtoB(oldX, oldY, x, y);
+		} else {
+			return direction;
+		}
 	}
 }

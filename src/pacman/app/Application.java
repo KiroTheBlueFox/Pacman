@@ -16,6 +16,7 @@ import pacman.game.TopMenu;
 import pacman.game.entities.PacMan;
 import pacman.game.maze.Maze;
 import pacman.game.maze.classic.ClassicMaze;
+import pacman.utils.Direction;
 
 public class Application {
 	private static Game game;
@@ -58,7 +59,7 @@ public class Application {
 		window.addKeyListener(new GameKeyListener());
 
 		timer = new Timer();
-		timer.schedule(new AppRefresher(), 0, 1000 / FPS);
+		timer.schedule(new AppRefresher(), 3000, 1000/FPS);
 	}
 
 	private static void startGame() {
@@ -66,7 +67,8 @@ public class Application {
 		game.setCurrentMaze(maze);
 
 //		player = new PacMan((maze.getPlayerSpawnX()-maze.getTileSize()/2f)/(float) maze.getTileSize(), (maze.getPlayerSpawnY()-maze.getTileSize()/2f)/(float) maze.getTileSize(), maze.getTileSize(), maze.getTileSize());
-		player = new PacMan(maze.getPlayerSpawnX(), maze.getPlayerSpawnY(), maze.getTileSize(), maze.getTileSize());
+		player = new PacMan(maze.getPlayerSpawnX(), maze.getPlayerSpawnY(), maze.getTileSize(), maze.getTileSize(), Direction.LEFT);
+		player.setDirection(Direction.LEFT);
 		game.addActor(player);
 	}
 
@@ -113,7 +115,6 @@ public class Application {
 	}
 
 	public static void close() {
-		Clips.closeClips();
 		timer.cancel();
 		game.close();
 		game = null;
