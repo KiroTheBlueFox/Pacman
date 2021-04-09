@@ -6,11 +6,11 @@ import pacman.game.Game;
 
 public class AppRefresher extends TimerTask {
 	private long lastTime;
-	
+
 	public AppRefresher() {
 		lastTime = System.currentTimeMillis();
 	}
-	
+
 	@Override
 	public void run() {
 		Game game = Application.getGame();
@@ -18,7 +18,7 @@ public class AppRefresher extends TimerTask {
 		Application.getTopMenu().repaint();
 		Application.getBottomMenu().repaint();
 		long now = System.currentTimeMillis();
-		game.act((now-lastTime)/1000d);
+		game.act((now - lastTime) / 1000d);
 		this.lastTime = now;
 	}
 }

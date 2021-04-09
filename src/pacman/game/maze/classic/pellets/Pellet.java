@@ -26,7 +26,8 @@ public class Pellet {
 	
 	public void draw(Graphics2D brush) {
 		brush.setRenderingHints(maze.getGame().noAntialiasingRH);
-		spritesheet.drawSprite(brush, (int) ((x+0.5f)*maze.getTileSize()), (int) ((y+0.5f)*maze.getTileSize()), PELLET_ANIMATION_INDEX, 0);
+		spritesheet.drawSprite(brush, (int) ((x + 0.5f) * maze.getTileSize()), (int) ((y + 0.5f) * maze.getTileSize()),
+				PELLET_ANIMATION_INDEX, 0);
 		brush.setRenderingHints(maze.getGame().antialiasingRH);
 	}
 	

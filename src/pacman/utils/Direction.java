@@ -5,13 +5,13 @@ import java.util.List;
 
 public enum Direction {
 	UP(1), DOWN(3), LEFT(2), RIGHT(4);
-	
+
 	private int priority;
-	
+
 	private Direction(int priority) {
 		this.priority = priority;
 	}
-	
+
 	public Direction getOpposite() {
 		switch (this) {
 		case UP:
@@ -26,7 +26,7 @@ public enum Direction {
 			return this;
 		}
 	}
-	
+
 	public Direction rotateClockwise() {
 		switch (this) {
 		case UP:
@@ -41,7 +41,7 @@ public enum Direction {
 			return this;
 		}
 	}
-	
+
 	public Direction rotateCounterClockwise() {
 		switch (this) {
 		case UP:
@@ -56,7 +56,7 @@ public enum Direction {
 			return this;
 		}
 	}
-	
+
 	public int toDegrees() {
 		switch (this) {
 		case UP:
@@ -71,25 +71,30 @@ public enum Direction {
 		}
 	}
 	
-	public static Direction[] fromAtoB(float x, float y, float f, float g) {
-		Direction[] directions = new Direction[2];
-		if (x > f) {
-			directions[0] = RIGHT;
+	public static Direction fromAngle(double angle) {
+		if (angle < 0)
+			angle += 360;
+		angle += 45;
+		angle /= 90;
+		if (angle >= 0 && angle < 1) {
+			return RIGHT;
+		} else if (angle >= 1 && angle < 2) {
+			return DOWN;
+		} else if (angle >= 2 && angle < 3) {
+			return LEFT;
 		} else {
-			directions[0] = LEFT;
+			return UP;
 		}
-		if (y > g) {
-			directions[1] = DOWN;
-		} else {
-			directions[1] = UP;
-		}
-		return directions;
 	}
-	
+
+	public static Direction fromAtoB(float xA, float yA, float xB, float yB) {
+		return fromAngle(Math.toDegrees(Math.atan2(yB-yA, xB-xA)));
+	}
+
 	public int getPriority() {
 		return this.priority;
 	}
-	
+
 	public static Direction fromPriority(int priority) {
 		switch (priority) {
 		default:
@@ -103,11 +108,11 @@ public enum Direction {
 			return RIGHT;
 		}
 	}
-	
+
 	public static Direction getHighestPriority(Direction... directions) {
 		return getHighestPriority(Arrays.asList(directions));
 	}
-	
+
 	public static Direction getHighestPriority(List<Direction> directions) {
 		int highestPriority = -1;
 		for (Direction direction : directions) {

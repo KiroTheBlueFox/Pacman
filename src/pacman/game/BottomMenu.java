@@ -14,29 +14,35 @@ import pacman.app.Application;
 public class BottomMenu extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private RenderingHints rh;
-	
+
 	public BottomMenu() {
 		setPreferredSize(new Dimension(WIDTH, 64));
 		setBackground(Color.black);
-		
+
 		rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		rh.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 	}
-	
+
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D brush = (Graphics2D) g.create();
 		brush.setRenderingHints(rh);
-		
-		double scale = Math.min((Application.getGame().getWidth()-Game.MARGIN*2)/(float) Application.getGame().getCurrentMaze().getWidth(), (Application.getGame().getHeight()-Game.MARGIN*2)/(float) Application.getGame().getCurrentMaze().getHeight());
-		brush.translate((Application.getGame().getWidth()-(Application.getGame().getCurrentMaze().getWidth()*scale))/2, 0);
-		
+
+		double scale = Math.min(
+				(Application.getGame().getWidth() - Game.MARGIN * 2)
+						/ (float) Application.getGame().getCurrentMaze().getWidth(),
+				(Application.getGame().getHeight() - Game.MARGIN * 2)
+						/ (float) Application.getGame().getCurrentMaze().getHeight());
+		brush.translate(
+				(Application.getGame().getWidth() - (Application.getGame().getCurrentMaze().getWidth() * scale)) / 2,
+				0);
+
 		brush.setColor(Color.yellow);
 		brush.fillArc(8, 8, 48, 48, 45, 270);
-		
+
 		brush.setColor(Color.white);
 		brush.setFont(new Font("arial", Font.BOLD, 48));
-		brush.drawString("\u00D7"+Application.getPlayer().getLives(), 56, 48);
+		brush.drawString("\u00D7" + Application.getPlayer().getLives(), 56, 48);
 	}
 }

@@ -5,10 +5,11 @@ import pacman.utils.Direction;
 import pacman.utils.Spritesheet;
 
 public class Blinky extends Ghost {
-	public Blinky(float x, float y, float width, float height, boolean spawning, Direction spawnDirection) {
-		super("blinky", x, y, width, height, new Spritesheet("assets/classicmaze/blinky.png", 0.1, 5, 2, 2, 2, 2, 2), spawning, spawnDirection);
+	public Blinky(int x, int y, int width, int height, boolean spawning, Direction spawnDirection) {
+		super("blinky", x, y, width, height, new Spritesheet("assets/classicmaze/blinky.png", 0.1, 5, 2, 2, 2, 2, 2),
+				spawning, spawnDirection);
 	}
-	
+
 	@Override
 	public void act(double delta) {
 		switch (mode) {
@@ -18,8 +19,8 @@ public class Blinky extends Ghost {
 			break;
 		default:
 		case SCATTER:
-			targetX = game.getCurrentMaze().getWidth()-game.getCurrentMaze().getTileSize()*3;
-			targetY = -game.getCurrentMaze().getTileSize()*4;
+			targetX = game.getCurrentMaze().getWidth()/game.getCurrentMaze().getTileSize() - 3;
+			targetY = -4;
 			break;
 		case EATEN:
 			targetX = game.getCurrentMaze().getGhostSpawnX();

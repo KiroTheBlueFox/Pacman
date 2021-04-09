@@ -27,30 +27,32 @@ public class Game extends JPanel {
 	private GameSpeed speed;
 
 	public Game() {
-		this.actors = new ArrayList<Entity>(); 
+		this.actors = new ArrayList<Entity>();
 		this.setBackground(Color.black);
-		
+
 		speed = GameSpeed.NORMAL;
 		antialiasingRH = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		antialiasingRH.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		noAntialiasingRH = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
 	}
-	
+
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		Graphics2D brush = (Graphics2D) g.create();
 		Stroke defaultStroke = brush.getStroke();
 		brush.setRenderingHints(antialiasingRH);
-		
+
 //		brush.setColor(Color.black);
 //		brush.fillRect(0, 0, (int) getWidth(), (int) getHeight());
 
 		if (currentMaze != null) {
-			double scale = Math.min((getWidth()-MARGIN*2)/(float) currentMaze.getWidth(), (getHeight()-MARGIN*2)/(float) currentMaze.getHeight());
-			brush.translate((getWidth()-(currentMaze.getWidth()*scale))/2, (getHeight()-(currentMaze.getHeight()*scale))/2);
+			double scale = Math.min((getWidth() - MARGIN * 2) / (float) currentMaze.getWidth(),
+					(getHeight() - MARGIN * 2) / (float) currentMaze.getHeight());
+			brush.translate((getWidth() - (currentMaze.getWidth() * scale)) / 2,
+					(getHeight() - (currentMaze.getHeight() * scale)) / 2);
 			brush.scale(scale, scale);
-			
+
 			currentMaze.draw(brush);
 			brush.setStroke(defaultStroke);
 			if (Application.debug) {
@@ -62,7 +64,7 @@ public class Game extends JPanel {
 				brush.setRenderingHints(antialiasingRH);
 				brush.setStroke(defaultStroke);
 			}
-			
+
 			brush.setColor(Color.white);
 			for (Pellet[] line : currentMaze.getPellets()) {
 				for (Pellet pellet : line) {
@@ -71,27 +73,38 @@ public class Game extends JPanel {
 				}
 			}
 			brush.setStroke(defaultStroke);
-			
+
 			brush.setColor(Color.white);
 			this.actors.forEach((actor) -> {
 				actor.draw(brush);
 				brush.setStroke(defaultStroke);
-				if (Application.debug) {
-					brush.setRenderingHints(noAntialiasingRH);
-					actor.drawDebug(brush);
-					brush.setRenderingHints(antialiasingRH);
-					brush.setStroke(defaultStroke);
-				}
 			});
-			
+
 			brush.setColor(Color.black);
 			brush.fillRect(-getWidth(), 0, getWidth(), getHeight());
 			brush.fillRect(currentMaze.getWidth(), 0, getWidth(), getHeight());
 			brush.fillRect(0, getHeight(), getWidth(), getHeight());
 			brush.fillRect(0, currentMaze.getHeight(), getWidth(), getHeight());
+			
+			if (Application.debug) {
+				brush.setRenderingHints(noAntialiasingRH);
+				
+				brush.setColor(Color.blue);
+				currentMaze.drawDebug(brush);
+				brush.setColor(Color.darkGray);
+				currentMaze.drawGrid(brush);
+				brush.setStroke(defaultStroke);
+				
+				this.actors.forEach((actor) -> {
+					actor.drawDebug(brush);
+					brush.setStroke(defaultStroke);
+				});
+				
+				brush.setRenderingHints(antialiasingRH);
+			}
 		}
 	}
-	
+
 	public void act(double delta) {
 		boolean moving = false;
 		for (Entity actor : this.actors) {
@@ -104,24 +117,24 @@ public class Game extends JPanel {
 			Application.stopSounds(Clips.getMoveClips());
 		}
 	}
-	
+
 	public void addActor(Entity actor) {
 		this.actors.add(actor);
 		actor.setGame(this);
 	}
-	
+
 	public void removeActor(Entity actor) {
 		this.actors.remove(actor);
 	}
-	
+
 	public List<Entity> getActors() {
 		return actors;
 	}
-	
+
 	public Maze getCurrentMaze() {
 		return currentMaze;
 	}
-	
+
 	public void setCurrentMaze(Maze currentMaze) {
 		this.currentMaze = currentMaze;
 		this.currentMaze.setGame(this);
@@ -130,22 +143,23 @@ public class Game extends JPanel {
 
 	/**
 	 * Detects if the Entity can move in said direction of said distance
-	 * @param entity The entity from which to detect collisions
+	 * 
+	 * @param entity    The entity from which to detect collisions
 	 * @param direction Direction to go
-	 * @param distance Distance to go
-	 * @param force If you don't want in-between calculations
-	 * @return Something below 0 if there is enough space<br>The distance otherwise
+	 * @param distance  Distance to go
+	 * @param force     If you don't want in-between calculations
+	 * @return Something below 0 if there is enough space<br>
+	 *         The distance otherwise
 	 */
 	public boolean isEnoughSpaceInDirection(Entity entity, Direction direction, int distance, boolean force) {
 		if (distance > 1 && !force) {
-			for (int i = 0; i < distance/currentMaze.getTileSize(); i++) {
+			for (int i = 0; i < distance / currentMaze.getTileSize(); i++) {
 				if (!isEnoughSpaceInDirection(entity, direction, i, true))
 					return false;
 			}
 			return isEnoughSpaceInDirection(entity, direction, distance, true);
 		} else {
-			int x = entity.getGridX(),
-				y = entity.getGridY();
+			int x = entity.getGridX(), y = entity.getGridY();
 			switch (direction) {
 			case DOWN:
 				y += distance;
@@ -162,8 +176,7 @@ public class Game extends JPanel {
 			default:
 				break;
 			}
-			if (x >= 0 && x < currentMaze.getWalls().length &&
-					y >= 0 && y < currentMaze.getWalls()[x].length) {
+			if (x >= 0 && x < currentMaze.getWalls().length && y >= 0 && y < currentMaze.getWalls()[x].length) {
 				if (currentMaze.getWalls()[x][y]) {
 					return false;
 				}
@@ -189,7 +202,7 @@ public class Game extends JPanel {
 	public void close() {
 		currentMaze.close();
 	}
-	
+
 	public void setSpeed(GameSpeed speed) {
 		this.speed = speed;
 		for (GameSpeed speed1 : GameSpeed.values()) {
@@ -198,11 +211,7 @@ public class Game extends JPanel {
 			}
 		}
 	}
-	
-	public int[] absolutePositionToGridPosition(float x, float y) {
-		return new int[] {(int) (x/(float) currentMaze.getTileSize()), (int) (y/(float) currentMaze.getTileSize())};
-	}
-	
+
 	public GameSpeed getSpeed() {
 		return this.speed;
 	}

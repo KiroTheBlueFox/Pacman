@@ -10,21 +10,17 @@ import pacman.utils.MathUtils;
 import pacman.utils.Spritesheet;
 
 public abstract class Entity {
-	protected static final int IDLE_ANIMATION_INDEX = 0,
-			DOWN_ANIMATION_INDEX = 1,
-			LEFT_ANIMATION_INDEX = 2,
-			RIGHT_ANIMATION_INDEX = 3,
-			UP_ANIMATION_INDEX = 4;
-	protected double timeSinceLastFrame = 0;
+	protected static final int IDLE_ANIMATION_INDEX = 0, DOWN_ANIMATION_INDEX = 1, LEFT_ANIMATION_INDEX = 2,
+			RIGHT_ANIMATION_INDEX = 3, UP_ANIMATION_INDEX = 4;
 	protected String id;
-	protected float x, y, oldX, oldY, width, height, speed;
-	protected double lifeTime, lastTime = 0;
+	protected int x, y, oldX, oldY, width, height, animationFrame = 0;
+	protected float speed;
+	protected double lifeTime, lastTime, timeSinceLastFrame;
 	protected Direction direction;
 	protected Spritesheet spritesheet;
-	protected int animationFrame = 0;
 	protected Game game;
-	
-	public Entity(String id, float x, float y, float width, float height, Spritesheet defaultSpritesheet) {
+
+	public Entity(String id, int x, int y, int width, int height, Spritesheet defaultSpritesheet) {
 		this.id = id;
 		this.x = x;
 		this.oldX = x;
@@ -34,33 +30,60 @@ public abstract class Entity {
 		this.height = height;
 		this.direction = null;
 		this.lifeTime = 0;
+		this.lastTime = 0;
+		this.timeSinceLastFrame = 0;
 		spritesheet = defaultSpritesheet;
 	}
-	
+
 	public void draw(Graphics2D brush) {
-		float centerX = getCenterX(),
-				centerY = getCenterY(),
+		float centerX = getCenterX(), centerY = getCenterY(),
 				offset = (float) (MathUtils.normalize(lastTime, speed)-0.5)*game.getCurrentMaze().getTileSize();
 		int index = IDLE_ANIMATION_INDEX;
 		if (direction == null) {
-			spritesheet.drawSprite(brush, (int) centerX, (int) centerY, IDLE_ANIMATION_INDEX, animationFrame%spritesheet.getFrameCount(IDLE_ANIMATION_INDEX));
+			spritesheet.drawSprite(brush, (int) centerX, (int) centerY, IDLE_ANIMATION_INDEX,
+					animationFrame % spritesheet.getFrameCount(IDLE_ANIMATION_INDEX));
 		} else {
-			switch (direction) {
+			if (offset > 0 && !game.isEnoughSpaceInDirection(this, direction, 1, false)) {
+				offset = 0;
+			}
+			Direction offsetDirection = direction;
+			if (offset < 0) {
+				offsetDirection = Direction.fromAtoB(oldX, oldY, x, y);
+			}
+			switch (offsetDirection) {
 			case DOWN:
 				index = DOWN_ANIMATION_INDEX;
-				spritesheet.drawSprite(brush, (int) (centerX), (int) (centerY+offset), DOWN_ANIMATION_INDEX, animationFrame%spritesheet.getFrameCount(DOWN_ANIMATION_INDEX));
+				centerY += offset;
 				break;
 			case LEFT:
 				index = LEFT_ANIMATION_INDEX;
-				spritesheet.drawSprite(brush, (int) (centerX-offset), (int) (centerY), LEFT_ANIMATION_INDEX, animationFrame%spritesheet.getFrameCount(LEFT_ANIMATION_INDEX));
+				centerX -= offset;
 				break;
 			case RIGHT:
 				index = RIGHT_ANIMATION_INDEX;
-				spritesheet.drawSprite(brush, (int) (centerX+offset), (int) (centerY), RIGHT_ANIMATION_INDEX, animationFrame%spritesheet.getFrameCount(RIGHT_ANIMATION_INDEX));
+				centerX += offset;
 				break;
 			case UP:
 				index = UP_ANIMATION_INDEX;
-				spritesheet.drawSprite(brush, (int) (centerX), (int) (centerY-offset), UP_ANIMATION_INDEX, animationFrame%spritesheet.getFrameCount(UP_ANIMATION_INDEX));
+				centerY -= offset;
+				break;
+			}
+			switch (direction) {
+			case DOWN:
+				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
+						animationFrame % spritesheet.getFrameCount(index));
+				break;
+			case LEFT:
+				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
+						animationFrame % spritesheet.getFrameCount(index));
+				break;
+			case RIGHT:
+				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
+						animationFrame % spritesheet.getFrameCount(index));
+				break;
+			case UP:
+				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
+						animationFrame % spritesheet.getFrameCount(index));
 				break;
 			default:
 				break;
@@ -68,112 +91,116 @@ public abstract class Entity {
 		}
 		if (timeSinceLastFrame >= spritesheet.getFrameTime()) {
 			timeSinceLastFrame = 0;
-			animationFrame = (animationFrame+1)%spritesheet.getFrameCount(index);
+			animationFrame = (animationFrame + 1) % spritesheet.getFrameCount(index);
 		}
 	}
-	
+
 	public void drawDebug(Graphics2D brush) {
 		brush.setColor(Color.black);
-		brush.drawRect(Math.round(x*game.getCurrentMaze().getTileSize()), Math.round(y*game.getCurrentMaze().getTileSize()), Math.round(width), Math.round(height));
+		brush.drawRect(Math.round(x * game.getCurrentMaze().getTileSize()),
+				Math.round(y * game.getCurrentMaze().getTileSize()), Math.round(width), Math.round(height));
 		brush.setRenderingHints(game.antialiasingRH);
-		brush.fillOval((int) getCenterX()-1, (int) getCenterY()-1, 2, 2);
+		brush.fillOval((int) getCenterX() - 1, (int) getCenterY() - 1, 2, 2);
 		brush.setRenderingHints(game.noAntialiasingRH);
 	}
-	
+
 	public void act(double delta) {
 		this.lifeTime += delta;
+		this.lastTime += delta;
 		this.timeSinceLastFrame += delta;
 	};
-	
+
 	public void setGame(Game game) {
 		this.game = game;
 	}
-	
+
 	public String getId() {
 		return id;
 	}
-	
-	public float getX() {
+
+	public int getX() {
 		return x;
 	}
-	
+
 	public int getGridX() {
 		return (int) x;
 	}
-	
+
 	public float getCenterX() {
-		return (x*game.getCurrentMaze().getTileSize())+width/2f;
+		return (x * game.getCurrentMaze().getTileSize()) + width / 2f;
 	}
-	
-	public float getY() {
+
+	public int getY() {
 		return y;
 	}
-	
+
 	public int getGridY() {
 		return (int) y;
 	}
-	
+
 	public float getCenterY() {
-		return (y*game.getCurrentMaze().getTileSize())+width/2f;
+		return (y * game.getCurrentMaze().getTileSize()) + width / 2f;
 	}
-	
+
 	public Game getGame() {
 		return game;
 	}
-	
+
 	public float getWidth() {
 		return width;
 	}
-	
+
 	public float getHeight() {
 		return height;
 	}
-	
+
 	public Direction getDirection() {
 		return direction;
 	}
-	
+
 	public double getLifeTime() {
 		return lifeTime;
 	}
-	
-	public void setX(float x) {
+
+	public void setX(int x) {
 		this.x = x;
 	}
-	
-	public void setY(float y) {
+
+	public void setY(int y) {
 		this.y = y;
 	}
-	
-	public void setWidth(float width) {
+
+	public void setWidth(int width) {
 		this.width = width;
 	}
-	
-	public void setHeight(float height) {
+
+	public void setHeight(int height) {
 		this.height = height;
 	}
-	
+
 	public void setDirection(Direction direction) {
 		if (direction != this.direction) {
 			this.animationFrame = 0;
 			this.direction = direction;
 		}
 	}
-	
-	public void move(float x, float y) {
+
+	public void move(int x, int y) {
 		this.oldX = this.x;
 		this.oldY = this.y;
 		this.x += x;
 		this.y += y;
-		if (this.x > game.getCurrentMaze().getWidth()) {
+		int maxWidth = game.getCurrentMaze().getWidth()/game.getCurrentMaze().getTileSize();
+		int maxHeight = game.getCurrentMaze().getHeight()/game.getCurrentMaze().getTileSize();
+		if (this.x > maxWidth) {
 			this.x = -this.width;
 		} else if (this.x < -this.width) {
-			this.x = game.getCurrentMaze().getWidth();
+			this.x = maxWidth;
 		}
-		if (this.y > game.getCurrentMaze().getHeight()) {
+		if (this.y > maxHeight) {
 			this.y = -this.height;
 		} else if (this.y < -this.height) {
-			this.y = game.getCurrentMaze().getHeight();
+			this.y = maxHeight;
 		}
 		Application.playSound(getGame().getSpeed().getMovementClip(), 1, false);
 	}

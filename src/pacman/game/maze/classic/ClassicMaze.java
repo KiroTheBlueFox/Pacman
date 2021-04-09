@@ -3,9 +3,14 @@ package pacman.game.maze.classic;
 import java.awt.Graphics2D;
 import java.awt.Image;
 
+import pacman.game.entities.Blinky;
+import pacman.game.entities.Clyde;
+import pacman.game.entities.Inky;
+import pacman.game.entities.Pinky;
 import pacman.game.maze.Maze;
 import pacman.game.maze.classic.pellets.Pellet;
 import pacman.game.maze.classic.pellets.PowerPellet;
+import pacman.utils.Direction;
 import pacman.utils.ImageUtils;
 
 public class ClassicMaze extends Maze {
@@ -13,14 +18,14 @@ public class ClassicMaze extends Maze {
 	protected Image texture;
 
 	public ClassicMaze() {
-		super(224, 248, 8, 112, 188, 108, 88, "assets/classicmaze/");
+		super(224, 248, 8, 13, 23, 13, 11, "assets/classicmaze/");
 		texture = loadTextureFromFolder("maze.png");
 	}
-	
+
 	protected ClassicMaze(String folder) {
-		super(448, 496, 16, 224, 376, 216, 176, folder);
+		super(224, 248, 8, 13, 23, 13, 11, folder);
 	}
-	
+
 	@Override
 	public void draw(Graphics2D brush) {
 		if (texture != null) {
@@ -29,10 +34,10 @@ public class ClassicMaze extends Maze {
 			brush.setRenderingHints(getGame().antialiasingRH);
 		}
 	}
-	
+
 	@Override
 	protected void initWalls() {
-		this.walls = new boolean[this.width/this.tileSize][this.height/this.tileSize];
+		this.walls = new boolean[this.width / this.tileSize][this.height / this.tileSize];
 		int[][] colorArray = ImageUtils.imageToArray(loadTextureFromFolder(DEFAULT_MAP));
 		for (int x = 0; x < colorArray.length; x++) {
 			for (int y = 0; y < colorArray[x].length; y++) {
@@ -51,7 +56,7 @@ public class ClassicMaze extends Maze {
 
 	@Override
 	protected void initPellets() {
-		this.pellets = new Pellet[this.width/this.tileSize][this.height/this.tileSize];
+		this.pellets = new Pellet[this.width / this.tileSize][this.height / this.tileSize];
 		int[][] colorArray = ImageUtils.imageToArray(loadTextureFromFolder(DEFAULT_PELLET_MAP));
 		for (int x = 0; x < colorArray.length; x++) {
 			for (int y = 0; y < colorArray[x].length; y++) {
@@ -74,15 +79,15 @@ public class ClassicMaze extends Maze {
 	@Override
 	protected void initGhostZone() {
 	}
-	
+
 	@Override
 	protected void initGhosts() {
-		/*game.addActor(new Blinky(ghostSpawnX, ghostSpawnY, tileSize, tileSize, false, Direction.LEFT));
-		game.addActor(new Inky(184, 224, tileSize, tileSize, true, Direction.UP));
-		game.addActor(new Pinky(216, 224, tileSize, tileSize, true, Direction.DOWN));
-		game.addActor(new Clyde(248, 224, tileSize, tileSize, true, Direction.UP));*/
+		game.addActor(new Blinky(ghostSpawnX, ghostSpawnY, tileSize, tileSize, false, Direction.LEFT));
+		game.addActor(new Inky(12, 14, tileSize, tileSize, true, Direction.UP));
+		game.addActor(new Pinky(14, 14, tileSize, tileSize, true, Direction.DOWN));
+		game.addActor(new Clyde(16, 14, tileSize, tileSize, true, Direction.UP));
 	}
-	
+
 	@Override
 	public void close() {
 		texture.flush();

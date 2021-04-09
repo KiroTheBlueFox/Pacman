@@ -34,7 +34,7 @@ public enum Clips {
 
 	public static void closeClips() {
 		for (Clips clip : values()) {
-			clip.getClip().stop();
+			Application.stopSound(clip);
 			clip.getClip().close();
 		}
 	}
