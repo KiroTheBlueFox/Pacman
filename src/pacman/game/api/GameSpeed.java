@@ -1,4 +1,4 @@
-package pacman.utils;
+package pacman.game.api;
 
 import pacman.app.Clips;
 

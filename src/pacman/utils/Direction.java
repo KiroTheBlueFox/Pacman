@@ -1,7 +1,16 @@
 package pacman.utils;
 
+import java.util.Arrays;
+import java.util.List;
+
 public enum Direction {
-	UP, DOWN, LEFT, RIGHT;
+	UP(1), DOWN(3), LEFT(2), RIGHT(4);
+	
+	private int priority;
+	
+	private Direction(int priority) {
+		this.priority = priority;
+	}
 	
 	public Direction getOpposite() {
 		switch (this) {
@@ -75,5 +84,37 @@ public enum Direction {
 			directions[1] = UP;
 		}
 		return directions;
+	}
+	
+	public int getPriority() {
+		return this.priority;
+	}
+	
+	public static Direction fromPriority(int priority) {
+		switch (priority) {
+		default:
+		case 1:
+			return UP;
+		case 2:
+			return LEFT;
+		case 3:
+			return DOWN;
+		case 4:
+			return RIGHT;
+		}
+	}
+	
+	public static Direction getHighestPriority(Direction... directions) {
+		return getHighestPriority(Arrays.asList(directions));
+	}
+	
+	public static Direction getHighestPriority(List<Direction> directions) {
+		int highestPriority = -1;
+		for (Direction direction : directions) {
+			if (direction.getPriority() < highestPriority || highestPriority == -1) {
+				highestPriority = direction.getPriority();
+			}
+		}
+		return fromPriority(highestPriority);
 	}
 }

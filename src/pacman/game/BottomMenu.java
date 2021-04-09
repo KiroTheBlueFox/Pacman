@@ -29,7 +29,8 @@ public class BottomMenu extends JPanel {
 		Graphics2D brush = (Graphics2D) g.create();
 		brush.setRenderingHints(rh);
 		
-		brush.translate((getWidth()-Application.getGame().getCurrentMaze().getWidth())/2, 0);
+		double scale = Math.min((Application.getGame().getWidth()-Game.MARGIN*2)/(float) Application.getGame().getCurrentMaze().getWidth(), (Application.getGame().getHeight()-Game.MARGIN*2)/(float) Application.getGame().getCurrentMaze().getHeight());
+		brush.translate((Application.getGame().getWidth()-(Application.getGame().getCurrentMaze().getWidth()*scale))/2, 0);
 		
 		brush.setColor(Color.yellow);
 		brush.fillArc(8, 8, 48, 48, 45, 270);

@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import pacman.app.Application;
 import pacman.game.Game;
 import pacman.utils.Direction;
+import pacman.utils.MathUtils;
 import pacman.utils.Spritesheet;
 
 public abstract class Entity {
@@ -16,17 +17,19 @@ public abstract class Entity {
 			UP_ANIMATION_INDEX = 4;
 	protected double timeSinceLastFrame = 0;
 	protected String id;
-	protected float x, y, width, height;
-	protected double lifeTime;
+	protected float x, y, oldX, oldY, width, height, speed;
+	protected double lifeTime, lastTime = 0;
 	protected Direction direction;
 	protected Spritesheet spritesheet;
 	protected int animationFrame = 0;
 	protected Game game;
 	
-	public Entity(String id, int x, int y, int width, int height, Spritesheet defaultSpritesheet) {
+	public Entity(String id, float x, float y, float width, float height, Spritesheet defaultSpritesheet) {
 		this.id = id;
 		this.x = x;
+		this.oldX = x;
 		this.y = y;
+		this.oldY = y;
 		this.width = width;
 		this.height = height;
 		this.direction = null;
@@ -35,8 +38,9 @@ public abstract class Entity {
 	}
 	
 	public void draw(Graphics2D brush) {
-		float centerX = x+width/2f,
-				centerY = y+height/2f;
+		float centerX = getCenterX(),
+				centerY = getCenterY(),
+				offset = (float) (MathUtils.normalize(lastTime, speed)-0.5)*game.getCurrentMaze().getTileSize();
 		int index = IDLE_ANIMATION_INDEX;
 		if (direction == null) {
 			spritesheet.drawSprite(brush, (int) centerX, (int) centerY, IDLE_ANIMATION_INDEX, animationFrame%spritesheet.getFrameCount(IDLE_ANIMATION_INDEX));
@@ -44,19 +48,19 @@ public abstract class Entity {
 			switch (direction) {
 			case DOWN:
 				index = DOWN_ANIMATION_INDEX;
-				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, DOWN_ANIMATION_INDEX, animationFrame%spritesheet.getFrameCount(DOWN_ANIMATION_INDEX));
+				spritesheet.drawSprite(brush, (int) (centerX), (int) (centerY+offset), DOWN_ANIMATION_INDEX, animationFrame%spritesheet.getFrameCount(DOWN_ANIMATION_INDEX));
 				break;
 			case LEFT:
 				index = LEFT_ANIMATION_INDEX;
-				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, LEFT_ANIMATION_INDEX, animationFrame%spritesheet.getFrameCount(LEFT_ANIMATION_INDEX));
+				spritesheet.drawSprite(brush, (int) (centerX-offset), (int) (centerY), LEFT_ANIMATION_INDEX, animationFrame%spritesheet.getFrameCount(LEFT_ANIMATION_INDEX));
 				break;
 			case RIGHT:
 				index = RIGHT_ANIMATION_INDEX;
-				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, RIGHT_ANIMATION_INDEX, animationFrame%spritesheet.getFrameCount(RIGHT_ANIMATION_INDEX));
+				spritesheet.drawSprite(brush, (int) (centerX+offset), (int) (centerY), RIGHT_ANIMATION_INDEX, animationFrame%spritesheet.getFrameCount(RIGHT_ANIMATION_INDEX));
 				break;
 			case UP:
 				index = UP_ANIMATION_INDEX;
-				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, UP_ANIMATION_INDEX, animationFrame%spritesheet.getFrameCount(UP_ANIMATION_INDEX));
+				spritesheet.drawSprite(brush, (int) (centerX), (int) (centerY-offset), UP_ANIMATION_INDEX, animationFrame%spritesheet.getFrameCount(UP_ANIMATION_INDEX));
 				break;
 			default:
 				break;
@@ -69,8 +73,11 @@ public abstract class Entity {
 	}
 	
 	public void drawDebug(Graphics2D brush) {
-		brush.setColor(Color.red);
-		brush.drawRect(Math.round(x), Math.round(y), Math.round(width), Math.round(height));
+		brush.setColor(Color.black);
+		brush.drawRect(Math.round(x*game.getCurrentMaze().getTileSize()), Math.round(y*game.getCurrentMaze().getTileSize()), Math.round(width), Math.round(height));
+		brush.setRenderingHints(game.antialiasingRH);
+		brush.fillOval((int) getCenterX()-1, (int) getCenterY()-1, 2, 2);
+		brush.setRenderingHints(game.noAntialiasingRH);
 	}
 	
 	public void act(double delta) {
@@ -90,8 +97,24 @@ public abstract class Entity {
 		return x;
 	}
 	
+	public int getGridX() {
+		return (int) x;
+	}
+	
+	public float getCenterX() {
+		return (x*game.getCurrentMaze().getTileSize())+width/2f;
+	}
+	
 	public float getY() {
 		return y;
+	}
+	
+	public int getGridY() {
+		return (int) y;
+	}
+	
+	public float getCenterY() {
+		return (y*game.getCurrentMaze().getTileSize())+width/2f;
 	}
 	
 	public Game getGame() {
@@ -138,6 +161,8 @@ public abstract class Entity {
 	}
 	
 	public void move(float x, float y) {
+		this.oldX = this.x;
+		this.oldY = this.y;
 		this.x += x;
 		this.y += y;
 		if (this.x > game.getCurrentMaze().getWidth()) {

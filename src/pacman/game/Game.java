@@ -12,15 +12,15 @@ import javax.swing.JPanel;
 
 import pacman.app.Application;
 import pacman.app.Clips;
+import pacman.game.api.GameSpeed;
 import pacman.game.entities.Entity;
 import pacman.game.maze.Maze;
 import pacman.game.maze.classic.pellets.Pellet;
 import pacman.utils.Direction;
-import pacman.utils.GameSpeed;
 
 public class Game extends JPanel {
 	private static final long serialVersionUID = 1L;
-	private static final int MARGIN = 8;
+	public static final int MARGIN = 8;
 	private List<Entity> actors;
 	private Maze currentMaze;
 	public final RenderingHints antialiasingRH, noAntialiasingRH;
@@ -51,12 +51,14 @@ public class Game extends JPanel {
 			brush.translate((getWidth()-(currentMaze.getWidth()*scale))/2, (getHeight()-(currentMaze.getHeight()*scale))/2);
 			brush.scale(scale, scale);
 			
-			brush.setColor(Color.blue);
 			currentMaze.draw(brush);
 			brush.setStroke(defaultStroke);
 			if (Application.debug) {
 				brush.setRenderingHints(noAntialiasingRH);
+				brush.setColor(Color.blue);
 				currentMaze.drawDebug(brush);
+				brush.setColor(Color.darkGray);
+				currentMaze.drawGrid(brush);
 				brush.setRenderingHints(antialiasingRH);
 				brush.setStroke(defaultStroke);
 			}
@@ -134,96 +136,54 @@ public class Game extends JPanel {
 	 * @param force If you don't want in-between calculations
 	 * @return Something below 0 if there is enough space<br>The distance otherwise
 	 */
-	public float isEnoughSpaceInDirection(Entity entity, Direction direction, float distance, boolean force) {
-		if (distance > currentMaze.getTileSize() && !force) {
+	public boolean isEnoughSpaceInDirection(Entity entity, Direction direction, int distance, boolean force) {
+		if (distance > 1 && !force) {
 			for (int i = 0; i < distance/currentMaze.getTileSize(); i++) {
-				float calculatedDistance = isEnoughSpaceInDirection(entity, direction, currentMaze.getTileSize()*i, true);
-				if (calculatedDistance >= 0)
-					return calculatedDistance;
+				if (!isEnoughSpaceInDirection(entity, direction, i, true))
+					return false;
 			}
 			return isEnoughSpaceInDirection(entity, direction, distance, true);
 		} else {
-			float x = entity.getX()+entity.getWidth()/2,
-					y = entity.getY()+entity.getHeight()/2;
+			int x = entity.getGridX(),
+				y = entity.getGridY();
 			switch (direction) {
 			case DOWN:
-				y += distance+entity.getHeight()/2;
+				y += distance;
 				break;
 			case LEFT:
-				x -= distance+entity.getWidth()/2;
+				x -= distance;
 				break;
 			case RIGHT:
-				x += distance+entity.getWidth()/2;
+				x += distance;
 				break;
 			case UP:
-				y -= distance+entity.getHeight()/2;
+				y -= distance;
 				break;
 			default:
 				break;
 			}
-			int newX = (int) (x/(float) currentMaze.getTileSize()), newY = (int) (y/(float) currentMaze.getTileSize());
-			if (newX >= 0 && newX < currentMaze.getWalls().length &&
-					newY >= 0 && newY < currentMaze.getWalls()[newX].length) {
-				if (currentMaze.getWalls()[newX][newY]) {
-					switch (direction) {
-					case UP:
-						return entity.getY()-(newY+1)*currentMaze.getTileSize();
-					case DOWN:
-						return newY*currentMaze.getTileSize()-(entity.getY()+entity.getHeight());
-					case LEFT:
-						return entity.getX()-(newX+1)*currentMaze.getTileSize();
-					case RIGHT:
-						return newX*currentMaze.getTileSize()-(entity.getX()+entity.getWidth());
-					}
-					return 0;
+			if (x >= 0 && x < currentMaze.getWalls().length &&
+					y >= 0 && y < currentMaze.getWalls()[x].length) {
+				if (currentMaze.getWalls()[x][y]) {
+					return false;
 				}
 			} else {
 				if (entity.getDirection() != null && entity.getDirection() != direction) {
-					return 0;
+					return false;
 				}
 			}
-			return -1;
+			return true;
 		}
 	}
 
 	public List<Direction> getAllPossibleWays(Entity entity) {
 		List<Direction> directions = new ArrayList<Direction>();
 		for (Direction direction : Direction.values()) {
-			if (isEnoughSpaceInDirection(entity, direction, currentMaze.getTileSize(), false) == -1)
+			if (isEnoughSpaceInDirection(entity, direction, 1, false)) {
 				directions.add(direction);
-		}
-		return directions;
-	}
-	
-	public float getDistanceInDirection(Entity entity, Direction direction) {
-		float distance = 0,
-				calculatedDistance;
-		boolean stop = false;
-		int i = 1;
-		while ((calculatedDistance = isEnoughSpaceInDirection(entity, direction, currentMaze.getTileSize()*i, false)) == -1 && !stop) {
-			distance += currentMaze.getTileSize();
-			i++;
-			switch (direction) {
-			case DOWN:
-				if (entity.getY()+distance > currentMaze.getHeight())
-					stop = true;
-				break;
-			case LEFT:
-				if (entity.getX()-distance < 0)
-					stop = true;
-				break;
-			case RIGHT:
-				if (entity.getX()+distance > currentMaze.getWidth())
-					stop = true;
-				break;
-			case UP:
-				if (entity.getY()-distance < 0)
-					stop = true;
-				break;
 			}
 		}
-		distance += calculatedDistance;
-		return (stop) ? -1 : distance;
+		return directions;
 	}
 
 	public void close() {
@@ -237,6 +197,10 @@ public class Game extends JPanel {
 				Application.stopSound(speed1.getMovementClip());
 			}
 		}
+	}
+	
+	public int[] absolutePositionToGridPosition(float x, float y) {
+		return new int[] {(int) (x/(float) currentMaze.getTileSize()), (int) (y/(float) currentMaze.getTileSize())};
 	}
 	
 	public GameSpeed getSpeed() {

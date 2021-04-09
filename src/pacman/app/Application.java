@@ -3,6 +3,7 @@ package pacman.app;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.util.Random;
 import java.util.Timer;
 
 import javax.sound.sampled.Clip;
@@ -12,14 +13,9 @@ import pacman.game.BottomMenu;
 import pacman.game.Game;
 import pacman.game.GameKeyListener;
 import pacman.game.TopMenu;
-import pacman.game.entities.Blinky;
-import pacman.game.entities.Clyde;
-import pacman.game.entities.Inky;
 import pacman.game.entities.PacMan;
-import pacman.game.entities.Pinky;
 import pacman.game.maze.Maze;
 import pacman.game.maze.classic.ClassicMaze;
-import pacman.utils.Direction;
 
 public class Application {
 	private static Game game;
@@ -27,8 +23,10 @@ public class Application {
 	private static BottomMenu bottomMenu;
 	private static PacMan player;
 	private static JFrame window;
+	private static Random random;
 	private static Timer timer;
 	public static final int FPS = 60;
+	public static final long DEFAULT_SEED = 0;
 	public static final float DEFAULT_VOLUME = 0.8f;
 	public static boolean debug = false;
 	
@@ -51,6 +49,8 @@ public class Application {
 		bottomMenu = new BottomMenu();
 		window.add(bottomMenu, BorderLayout.SOUTH);
 		
+		random = new Random(DEFAULT_SEED);
+		
 		startGame();
 		
 		window.setVisible(true);
@@ -65,13 +65,9 @@ public class Application {
 		Maze maze = new ClassicMaze();
 		game.setCurrentMaze(maze);
 		
-		player = new PacMan(maze.getPlayerSpawnX()-8, maze.getPlayerSpawnY()-8);
+//		player = new PacMan((maze.getPlayerSpawnX()-maze.getTileSize()/2f)/(float) maze.getTileSize(), (maze.getPlayerSpawnY()-maze.getTileSize()/2f)/(float) maze.getTileSize(), maze.getTileSize(), maze.getTileSize());
+		player = new PacMan((maze.getPlayerSpawnX())/(float) maze.getTileSize(), (maze.getPlayerSpawnY()-maze.getTileSize()/2f)/(float) maze.getTileSize(), maze.getTileSize(), maze.getTileSize());
 		game.addActor(player);
-		
-		game.addActor(new Blinky(216, 176, false, Direction.LEFT));
-		game.addActor(new Inky(184, 224, true, Direction.UP));
-		game.addActor(new Pinky(216, 224, true, Direction.DOWN));
-		game.addActor(new Clyde(248, 224, true, Direction.UP));
 	}
 	
 	public static synchronized boolean playSound(Clips clip1, int times, boolean force) {
@@ -112,12 +108,16 @@ public class Application {
 		return player;
 	}
 	
+	public static Random getRandom() {
+		return random;
+	}
+	
 	public static void close() {
+		Clips.closeClips();
 		timer.cancel();
 		game.close();
 		game = null;
 		window.dispose();
-		Clips.closeClips();
 		System.exit(0);
 	}
 }
