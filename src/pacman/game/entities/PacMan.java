@@ -46,18 +46,24 @@ public class PacMan extends Entity {
 		if (direction != null) {
 			float distance = game.isEnoughSpaceInDirection(this, direction, (float) (delta*speed*getGame().getSpeed().getSpeedFactor()), false);
 			if (distance < 0) {
+				int newX = (int) ((x+width/2)/(float) game.getCurrentMaze().getTileSize()),
+					newY = (int) ((y+height/2)/(float) game.getCurrentMaze().getTileSize());
 				switch (direction) {
 				case DOWN:
 					this.move(0, (float) (delta*speed*getGame().getSpeed().getSpeedFactor()));
+					this.setX(newX*game.getCurrentMaze().getTileSize());
 					break;
 				case LEFT:
 					this.move((float) (-delta*speed*getGame().getSpeed().getSpeedFactor()), 0);
+					this.setY(newY*game.getCurrentMaze().getTileSize());
 					break;
 				case RIGHT:
 					this.move((float) (delta*speed*getGame().getSpeed().getSpeedFactor()), 0);
+					this.setY(newY*game.getCurrentMaze().getTileSize());
 					break;
 				case UP:
 					this.move(0, (float) (-delta*speed*getGame().getSpeed().getSpeedFactor()));
+					this.setX(newX*game.getCurrentMaze().getTileSize());
 					break;
 				}
 			} else {
@@ -89,11 +95,6 @@ public class PacMan extends Entity {
 				}
 			} catch (ArrayIndexOutOfBoundsException e) {}
 		}
-	}
-	
-	@Override
-	public void move(float x, float y) {
-		super.move(x, y);
 	}
 	
 	@Override

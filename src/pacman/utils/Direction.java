@@ -61,4 +61,19 @@ public enum Direction {
 			return 0;
 		}
 	}
+	
+	public static Direction[] fromAtoB(float x, float y, float f, float g) {
+		Direction[] directions = new Direction[2];
+		if (x > f) {
+			directions[0] = RIGHT;
+		} else {
+			directions[0] = LEFT;
+		}
+		if (y > g) {
+			directions[1] = DOWN;
+		} else {
+			directions[1] = UP;
+		}
+		return directions;
+	}
 }

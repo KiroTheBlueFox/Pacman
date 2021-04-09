@@ -143,9 +143,8 @@ public class Game extends JPanel {
 			}
 			return isEnoughSpaceInDirection(entity, direction, distance, true);
 		} else {
-			float playerX = entity.getX()+entity.getWidth()/2,
-					playerY = entity.getY()+entity.getHeight()/2,
-					x = playerX, y = playerY;
+			float x = entity.getX()+entity.getWidth()/2,
+					y = entity.getY()+entity.getHeight()/2;
 			switch (direction) {
 			case DOWN:
 				y += distance+entity.getHeight()/2;
@@ -177,23 +176,6 @@ public class Game extends JPanel {
 						return newX*currentMaze.getTileSize()-(entity.getX()+entity.getWidth());
 					}
 					return 0;
-				} else {
-					if (entity.getDirection() != null && entity.getDirection() != direction) {
-						switch (direction) {
-						case DOWN:
-							entity.setX(newX*currentMaze.getTileSize());
-							break;
-						case LEFT:
-							entity.setY(newY*currentMaze.getTileSize());
-							break;
-						case RIGHT:
-							entity.setY(newY*currentMaze.getTileSize());
-							break;
-						case UP:
-							entity.setX(newX*currentMaze.getTileSize());
-							break;
-						}
-					}
 				}
 			} else {
 				if (entity.getDirection() != null && entity.getDirection() != direction) {
@@ -202,6 +184,46 @@ public class Game extends JPanel {
 			}
 			return -1;
 		}
+	}
+
+	public List<Direction> getAllPossibleWays(Entity entity) {
+		List<Direction> directions = new ArrayList<Direction>();
+		for (Direction direction : Direction.values()) {
+			if (isEnoughSpaceInDirection(entity, direction, currentMaze.getTileSize(), false) == -1)
+				directions.add(direction);
+		}
+		return directions;
+	}
+	
+	public float getDistanceInDirection(Entity entity, Direction direction) {
+		float distance = 0,
+				calculatedDistance;
+		boolean stop = false;
+		int i = 1;
+		while ((calculatedDistance = isEnoughSpaceInDirection(entity, direction, currentMaze.getTileSize()*i, false)) == -1 && !stop) {
+			distance += currentMaze.getTileSize();
+			i++;
+			switch (direction) {
+			case DOWN:
+				if (entity.getY()+distance > currentMaze.getHeight())
+					stop = true;
+				break;
+			case LEFT:
+				if (entity.getX()-distance < 0)
+					stop = true;
+				break;
+			case RIGHT:
+				if (entity.getX()+distance > currentMaze.getWidth())
+					stop = true;
+				break;
+			case UP:
+				if (entity.getY()-distance < 0)
+					stop = true;
+				break;
+			}
+		}
+		distance += calculatedDistance;
+		return (stop) ? -1 : distance;
 	}
 
 	public void close() {
