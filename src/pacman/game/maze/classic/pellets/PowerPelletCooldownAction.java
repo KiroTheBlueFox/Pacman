@@ -11,9 +11,9 @@ public class PowerPelletCooldownAction extends TimerTask {
 	@Override
 	public void run() {
 		Game game = Application.getGame();
-		for (Entity actor : game.getActors()) {
-			if (actor instanceof Ghost) {
-				((Ghost) actor).setFrightenedCooldown(true);
+		for (Entity entity : game.getEntities()) {
+			if (entity instanceof Ghost) {
+				((Ghost) entity).setFrightenedCooldown(true);
 			}
 		}
 	}

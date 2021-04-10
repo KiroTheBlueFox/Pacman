@@ -1,18 +1,23 @@
 package pacman.game.api;
 
 public enum GhostMode {
-	CHASE(true),
-	SCATTER(false),
-	FRIGHTENED(true),
-	EATEN(false);
+	CHASE(true, true),
+	SCATTER(true, true),
+	FRIGHTENED(true, false),
+	EATEN(false, false);
 
-	private boolean rotate180;
+	private boolean turnAround, nextCanTurnAround;
 	
-	private GhostMode(boolean rotate180) {
-		this.rotate180 = rotate180;
+	private GhostMode(boolean turnAround, boolean nextCanTurnAround) {
+		this.turnAround = turnAround;
+		this.nextCanTurnAround = nextCanTurnAround;
 	}
 	
-	public boolean rotate180() {
-		return this.rotate180;
+	public boolean turnAround() {
+		return this.turnAround;
+	}
+	
+	public boolean nextCanTurnAround() {
+		return nextCanTurnAround;
 	}
 }

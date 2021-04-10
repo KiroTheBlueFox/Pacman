@@ -12,7 +12,9 @@ public class Spritesheet {
 	private BufferedImage fullSheet;
 	private int spriteWidth, spriteHeight, rowCount;
 	private int[] frames;
-	private double frameTime;
+	private double defaultFrameTime;
+	private double[] frameTime;
+	private boolean[] loop;
 	
 	public Spritesheet(String file, double frameTime, int rowCount, int... frames) {
 		if (rowCount == 0) {
@@ -47,7 +49,13 @@ public class Spritesheet {
 		}
 		spriteWidth = (int) tempSpriteWidth;
 		spriteHeight = (int) tempSpriteHeight;
-		this.frameTime = frameTime;
+		this.frameTime = new double[rowCount];
+		this.loop = new boolean[rowCount];
+		for (int i = 0; i < rowCount; i++) {
+			this.frameTime[i] = frameTime;
+			this.loop[i] = true;
+		}
+		this.defaultFrameTime = frameTime;
 		this.rowCount = rowCount;
 		this.frames = frames;
 	}
@@ -72,8 +80,24 @@ public class Spritesheet {
 		return fullSheet;
 	}
 	
+	public void setFrameTime(int index, double frameTime) {
+		this.frameTime[index] = frameTime;
+	}
+	
+	public double getFrameTime(int index) {
+		return frameTime[index];
+	}
+	
 	public double getFrameTime() {
-		return frameTime;
+		return defaultFrameTime;
+	}
+	
+	public boolean doesLoop(int index) {
+		return loop[index];
+	}
+	
+	public void setLoop(int index, boolean loop) {
+		this.loop[index] = loop;
 	}
 
 	public void drawSprite(Graphics2D brush, int x, int y, int animationIndex, int animationFrame) {

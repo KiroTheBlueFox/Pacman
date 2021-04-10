@@ -31,10 +31,11 @@ public class PowerPellet extends Pellet {
 	@Override
 	public void act(PacMan player, double delta) {
 		player.addScore(score);
+		maze.getGame().setPowerPellet(true);
 		Application.playSound(Clips.powerPellet, 3, true);
-		for (Entity actor : maze.getGame().getActors()) {
-			if (actor instanceof Ghost) {
-				Ghost ghost = ((Ghost) actor);
+		for (Entity entity : maze.getGame().getEntities()) {
+			if (entity instanceof Ghost) {
+				Ghost ghost = ((Ghost) entity);
 				if (ghost.getMode() != GhostMode.EATEN) {
 					ghost.setMode(GhostMode.FRIGHTENED, true);
 				}

@@ -33,12 +33,14 @@ public class Pellet {
 	
 	public void act(PacMan player, double delta) {
 		player.addScore(score);
-		if (highPitch) {
-			if (Application.playSound(Clips.munch2, 1, true))
-				highPitch = false;
-		} else {
-			if (Application.playSound(Clips.munch1, 1, true))
-				highPitch = true;
+		if (!maze.getGame().isPowerPellet() && !maze.getGame().isEaten()) {
+			if (highPitch) {
+				if (Application.playSound(Clips.munch2, 1, true))
+					highPitch = false;
+			} else {
+				if (Application.playSound(Clips.munch1, 1, true))
+					highPitch = true;
+			}
 		}
 	}
 	

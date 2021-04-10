@@ -6,7 +6,9 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.List;
+import java.util.TimerTask;
 
 import javax.swing.JPanel;
 
@@ -14,8 +16,10 @@ import pacman.app.Application;
 import pacman.app.Clips;
 import pacman.game.api.GameLevel;
 import pacman.game.api.GameSpeed;
+import pacman.game.api.GhostMode;
 import pacman.game.entities.Entity;
 import pacman.game.entities.Ghost;
+import pacman.game.entities.PacMan;
 import pacman.game.maze.Maze;
 import pacman.game.maze.classic.pellets.Pellet;
 import pacman.utils.Direction;
@@ -23,14 +27,15 @@ import pacman.utils.Direction;
 public class Game extends JPanel {
 	private static final long serialVersionUID = 1L;
 	public static final int MARGIN = 8;
-	private List<Entity> actors;
+	private List<Entity> entities;
 	private Maze currentMaze;
 	public final RenderingHints antialiasingRH, noAntialiasingRH;
 	private GameSpeed speed;
 	private GameLevel gameLevel;
+	private boolean powerPellet, eaten, clearing;
 
 	public Game() {
-		this.actors = new ArrayList<Entity>();
+		this.entities = new ArrayList<Entity>();
 		this.setBackground(Color.black);
 
 		speed = GameSpeed.NORMAL;
@@ -79,8 +84,8 @@ public class Game extends JPanel {
 			brush.setStroke(defaultStroke);
 
 			brush.setColor(Color.white);
-			this.actors.forEach((actor) -> {
-				actor.draw(brush);
+			this.entities.forEach((entity) -> {
+				entity.draw(brush);
 				brush.setStroke(defaultStroke);
 			});
 
@@ -99,8 +104,8 @@ public class Game extends JPanel {
 				currentMaze.drawGrid(brush);
 				brush.setStroke(defaultStroke);
 				
-				this.actors.forEach((actor) -> {
-					actor.drawDebug(brush);
+				this.entities.forEach((entity) -> {
+					entity.drawDebug(brush);
 					brush.setStroke(defaultStroke);
 				});
 				
@@ -110,44 +115,107 @@ public class Game extends JPanel {
 	}
 
 	public void act(double delta) {
-		boolean moving = false;
-		for (Entity actor : this.actors) {
-			actor.act(delta);
-			if (actor.getDirection() != null) {
-				moving = true;
+		try {
+			boolean moving = false;
+			for (Entity entity : this.entities) {
+				entity.act(delta);
+				if (entity.getDirection() != null) {
+					if (entity instanceof Ghost) {
+						if (((Ghost) entity).getMode() == GhostMode.EATEN) {
+							eaten = true;
+						} else {
+							eaten = false;
+							moving = true;
+						}
+					} else {
+						moving = true;
+					}
+				}
+				if (entity instanceof PacMan && ((PacMan) entity).isDead()) {
+					moving = false;
+				}
 			}
-		}
-		if (!moving) {
+			if (!clearing) {
+				if (!eaten) {
+					Application.stopSound(Clips.retreating);
+					if (!powerPellet) {
+						Application.stopSound(Clips.powerPellet);
+						if (moving) {
+							Application.playSound(speed.getMovementClip(), 1, false);
+						} else {
+							Application.stopSounds(Clips.getMoveClips());
+						}
+					} else {
+						Application.stopSounds(Clips.getMoveClips());
+						Application.playSound(Clips.powerPellet, 1, false);
+					}
+				} else {
+					Application.stopSounds(Clips.getMoveClips());
+					Application.stopSound(Clips.powerPellet);
+					Application.playSound(Clips.retreating, 1, false);
+				}
+			} else {
+				Application.stopSounds(Clips.getMoveClips());
+				Application.stopSound(Clips.powerPellet);
+				Application.stopSound(Clips.retreating);
+			}
+		} catch (ConcurrentModificationException e) {
 			Application.stopSounds(Clips.getMoveClips());
 		}
 	}
-
-	public void addActor(Entity actor) {
-		this.actors.add(actor);
-		actor.setGame(this);
+	
+	public void clear() {
+		Application.stopSounds(Clips.values());
+		clearing = true;
+		for (Entity entity : this.entities) {
+			if (entity instanceof Ghost)
+				((Ghost) entity).setShowing(false);
+		}
+	}
+	
+	public void restart() {
+		Application.pauseTimer();
+		for (Entity entity : this.entities) {
+			if (entity instanceof PacMan)
+				((PacMan) entity).respawn();
+			if (entity instanceof Ghost)
+				((Ghost) entity).reset();
+		}
+		Application.resumeTimer(Application.SPAWN_DELAY);
+		Application.getTimer().schedule(new TimerTask() {
+			@Override
+			public void run() {
+				Application.getGame().setClearing(false);
+			}
+		}, Application.SPAWN_DELAY);
 	}
 
-	public void removeActor(Entity actor) {
-		this.actors.remove(actor);
+	public void addEntity(Entity entity) {
+		this.entities.add(entity);
+		entity.setGame(this);
 	}
 
-	public List<Entity> getActors() {
-		return actors;
+	public void removeEntity(Entity entity) {
+		this.entities.remove(entity);
+	}
+
+	public List<Entity> getEntities() {
+		return entities;
 	}
 	
 	public Ghost getGhostById(String id) {
-		for (Entity actor : actors) {
-			if (actor.getId().contentEquals(id) && actor instanceof Ghost) {
-				return (Ghost) actor;
+		for (Entity entity : entities) {
+			if (entity.getId().contentEquals(id) && entity instanceof Ghost) {
+				return (Ghost) entity;
 			}
 		}
 		return null;
 	}
 	
-	public Entity getActorById(String id) {
-		for (Entity actor : actors) {
-			if (actor.getId().contentEquals(id)) {
-				return actor;
+	public Entity getEntityById(String id) {
+		for (Entity entity : entities) {
+			if (entity.getId().contentEquals(id)) {
+				return entity;
 			}
 		}
 		return null;
@@ -240,5 +308,29 @@ public class Game extends JPanel {
 
 	public GameSpeed getSpeed() {
 		return this.speed;
+	}
+	
+	public boolean isPowerPellet() {
+		return powerPellet;
+	}
+	
+	public void setPowerPellet(boolean powerPellet) {
+		this.powerPellet = powerPellet;
+	}
+	
+	public boolean isEaten() {
+		return eaten;
+	}
+	
+	public void setEaten(boolean eaten) {
+		this.eaten = eaten;
+	}
+	
+	public boolean isClearing() {
+		return clearing;
+	}
+	
+	public void setClearing(boolean clearing) {
+		this.clearing = clearing;
 	}
 }

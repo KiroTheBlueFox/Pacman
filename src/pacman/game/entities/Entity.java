@@ -53,10 +53,7 @@ public abstract class Entity {
 		float centerX = getCenterX(), centerY = getCenterY(),
 				offset = (float) (MathUtils.normalize(lastTime, speed)-0.5)*game.getCurrentMaze().getTileSize();
 		int index = IDLE_ANIMATION_INDEX;
-		if (direction == null) {
-			spritesheet.drawSprite(brush, (int) centerX, (int) centerY, IDLE_ANIMATION_INDEX,
-					animationFrame % spritesheet.getFrameCount(IDLE_ANIMATION_INDEX));
-		} else {
+		if (direction != null) {
 			if (offset > 0 && !game.isEnoughSpaceInDirection(this, direction, 1, false)) {
 				offset = 0;
 			}
@@ -82,13 +79,17 @@ public abstract class Entity {
 				centerY -= offset;
 				break;
 			}
-			spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
-					animationFrame % spritesheet.getFrameCount(index));
 		}
 		if (timeSinceLastFrame >= spritesheet.getFrameTime()) {
 			timeSinceLastFrame = 0;
-			animationFrame = (animationFrame + 1) % spritesheet.getFrameCount(index);
+			if (spritesheet.doesLoop(index)) {
+				animationFrame = (animationFrame + 1) % spritesheet.getFrameCount(index);
+			} else {
+				animationFrame = MathUtils.clamp(animationFrame+1, 0, spritesheet.getFrameCount(index)-1);
+			}
 		}
+		spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
+				animationFrame % spritesheet.getFrameCount(index));
 	}
 
 	public void drawDebug(Graphics2D brush) {
@@ -174,6 +175,7 @@ public abstract class Entity {
 
 	public void setDirection(Direction direction) {
 		if (direction != this.direction) {
+			this.timeSinceLastFrame = 0;
 			this.animationFrame = 0;
 			this.direction = direction;
 		}

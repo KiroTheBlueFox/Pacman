@@ -13,11 +13,23 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 public enum Clips {
 	munch1("assets/sounds/munch_1.wav"),
 	munch2("assets/sounds/munch_2.wav"),
+	eat_fruit("assets/sounds/eat_fruit.wav"),
+	eat_ghost("assets/sounds/eat_ghost.wav"),
 	move1("assets/sounds/siren_1.wav"),
 	move2("assets/sounds/siren_2.wav"),
 	move3("assets/sounds/siren_3.wav"),
-	powerPellet("assets/sounds/power_pellet.wav");
+	move4("assets/sounds/siren_4.wav"),
+	move5("assets/sounds/siren_5.wav"),
+	powerPellet("assets/sounds/power_pellet.wav"),
+	death1("assets/sounds/death_1.wav"),
+	death2("assets/sounds/death_2.wav"),
+	credit("assets/sounds/credit.wav"),
+	retreating("assets/sounds/retreating.wav"),
+	intermission("assets/sounds/intermission.wav"),
+	extend("assets/sounds/extend.wav"),
+	game_start("assets/sounds/game_start.wav");
 	private Clip clip;
+	private boolean alreadyPlayed = false;
 	
 	private Clips(String file) {
 		try {
@@ -30,6 +42,16 @@ public enum Clips {
 		} catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void play(int times) {
+		if (!alreadyPlayed) {
+			clip.start();
+			alreadyPlayed = true;
+			times--;
+		}
+		if (times > 0)
+			clip.loop(times);
 	}
 
 	public static void closeClips() {

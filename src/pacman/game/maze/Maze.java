@@ -142,8 +142,18 @@ public abstract class Maze {
 		this.pelletCount--;
 		if (this.pelletCount <= this.startingPelletCount * 0.5f) {
 			if (this.pelletCount <= this.startingPelletCount * 0.2f) {
-				if (game.getSpeed() != GameSpeed.FASTER)
-					game.setSpeed(GameSpeed.FASTER);
+				if (this.pelletCount <= this.startingPelletCount * 0.1f) {
+					if (this.pelletCount <= this.startingPelletCount * 0.05f) {
+						if (game.getSpeed() != GameSpeed.MAX)
+							game.setSpeed(GameSpeed.MAX);
+					} else {
+						if (game.getSpeed() != GameSpeed.FASTEST)
+							game.setSpeed(GameSpeed.FASTEST);
+					}
+				} else {
+					if (game.getSpeed() != GameSpeed.FASTER)
+						game.setSpeed(GameSpeed.FASTER);
+				}
 			} else {
 				if (game.getSpeed() != GameSpeed.FAST) {
 					game.setSpeed(GameSpeed.FAST);
@@ -156,7 +166,7 @@ public abstract class Maze {
 	}
 
 	private void endMaze() {
-		System.out.println("All pellets were eaten !");
+		
 	}
 
 	public boolean[][] getWalls() {
