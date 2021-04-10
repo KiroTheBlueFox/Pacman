@@ -70,26 +70,8 @@ public class PacMan extends Entity {
 						break;
 					}
 				}
-				switch (direction) {
-				case DOWN:
-					spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
-							animationFrame % spritesheet.getFrameCount(index));
-					break;
-				case LEFT:
-					spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
-							animationFrame % spritesheet.getFrameCount(index));
-					break;
-				case RIGHT:
-					spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
-							animationFrame % spritesheet.getFrameCount(index));
-					break;
-				case UP:
-					spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
-							animationFrame % spritesheet.getFrameCount(index));
-					break;
-				default:
-					break;
-				}
+				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
+						animationFrame % spritesheet.getFrameCount(index));
 			}
 			if (timeSinceLastFrame >= spritesheet.getFrameTime()) {
 				timeSinceLastFrame = 0;
@@ -103,7 +85,7 @@ public class PacMan extends Entity {
 	public void act(double delta) {
 		super.act(delta);
 
-		if (lastTime >= speed / getGame().getSpeed().getSpeedFactor()) {
+		if (lastTime >= getSpeed()) {
 			lastTime = 0;
 			if (nextDirection != null) {
 				if (nextDirection != direction && game.isEnoughSpaceInDirection(this, nextDirection, 1, false)) {
@@ -153,7 +135,7 @@ public class PacMan extends Entity {
 		} else {
 			if (direction != nextDirection && direction != this.direction) {
 				if (this.direction == null) {
-					this.lastTime = speed/getGame().getSpeed().getSpeedFactor();
+					this.lastTime = getSpeed();
 				}
 				this.animationFrame = 0;
 				this.nextDirection = direction;

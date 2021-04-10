@@ -25,8 +25,8 @@ public class Application {
 	private static PacMan player;
 	private static JFrame window;
 	private static Random random;
-	private static Timer timer;
-	public static final int FPS = 60;
+	private static Timer timer, powerPelletTimer;
+	public static final int FPS = 100;
 	public static final long DEFAULT_SEED = 0;
 	public static final float DEFAULT_VOLUME = 0.8f;
 	public static boolean debug = false;
@@ -59,7 +59,9 @@ public class Application {
 		window.addKeyListener(new GameKeyListener());
 
 		timer = new Timer();
-		timer.schedule(new AppRefresher(), 3000, 1000/FPS);
+		powerPelletTimer = new Timer();
+		int delay = 3000;
+		timer.schedule(new AppRefresher(delay), delay, 1000/FPS);
 	}
 
 	private static void startGame() {
@@ -112,6 +114,14 @@ public class Application {
 
 	public static Random getRandom() {
 		return random;
+	}
+	
+	public static Timer getTimer() {
+		return timer;
+	}
+	
+	public static Timer getPowerPelletTimer() {
+		return powerPelletTimer;
 	}
 
 	public static void close() {

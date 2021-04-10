@@ -82,26 +82,8 @@ public abstract class Entity {
 				centerY -= offset;
 				break;
 			}
-			switch (direction) {
-			case DOWN:
-				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
-						animationFrame % spritesheet.getFrameCount(index));
-				break;
-			case LEFT:
-				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
-						animationFrame % spritesheet.getFrameCount(index));
-				break;
-			case RIGHT:
-				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
-						animationFrame % spritesheet.getFrameCount(index));
-				break;
-			case UP:
-				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
-						animationFrame % spritesheet.getFrameCount(index));
-				break;
-			default:
-				break;
-			}
+			spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
+					animationFrame % spritesheet.getFrameCount(index));
 		}
 		if (timeSinceLastFrame >= spritesheet.getFrameTime()) {
 			timeSinceLastFrame = 0;
@@ -157,6 +139,10 @@ public abstract class Entity {
 	public float getHeight() {
 		return height;
 	}
+	
+	public float getSpeed() {
+		return (float) ((speed/getGame().getSpeed().getSpeedFactor())/getGame().getGameLevel().getSpeedFactor());
+	}
 
 	public Direction getDirection() {
 		return direction;
@@ -180,6 +166,10 @@ public abstract class Entity {
 
 	public void setHeight(int height) {
 		this.height = height;
+	}
+	
+	public void setSpeed(float speed) {
+		this.speed = speed;
 	}
 
 	public void setDirection(Direction direction) {

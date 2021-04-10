@@ -16,4 +16,13 @@ public class MathUtils {
 	public static double normalize(double value, double max) {
 		return value / max;
 	}
+	
+	public static int clamp(int value, int min, int max) {
+		if (value < min)
+			return min;
+		else if (value > max)
+			return max;
+		else
+			return value;
+	}
 }

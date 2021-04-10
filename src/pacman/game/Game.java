@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 
 import pacman.app.Application;
 import pacman.app.Clips;
+import pacman.game.api.GameLevel;
 import pacman.game.api.GameSpeed;
 import pacman.game.entities.Entity;
 import pacman.game.entities.Ghost;
@@ -26,12 +27,14 @@ public class Game extends JPanel {
 	private Maze currentMaze;
 	public final RenderingHints antialiasingRH, noAntialiasingRH;
 	private GameSpeed speed;
+	private GameLevel gameLevel;
 
 	public Game() {
 		this.actors = new ArrayList<Entity>();
 		this.setBackground(Color.black);
 
 		speed = GameSpeed.NORMAL;
+		gameLevel = new GameLevel(0);
 		antialiasingRH = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		antialiasingRH.put(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		noAntialiasingRH = new RenderingHints(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
@@ -220,6 +223,10 @@ public class Game extends JPanel {
 
 	public void close() {
 		currentMaze.close();
+	}
+	
+	public GameLevel getGameLevel() {
+		return gameLevel;
 	}
 
 	public void setSpeed(GameSpeed speed) {

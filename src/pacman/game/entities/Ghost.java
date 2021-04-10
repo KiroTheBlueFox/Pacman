@@ -12,9 +12,12 @@ import pacman.utils.Spritesheet;
 
 public class Ghost extends Entity {
 	public static final float SPEED = PacMan.SPEED/1.1f, SLOW_FACTOR = 2;
+	public static final int FRIGHTENED_NORMAL_INDEX = 0, FRIGHTENED_BLINKING_INDEX = 1;
 	protected boolean spawning = true;
 	protected Color debugColor = Color.magenta;
 	protected GhostMode mode = GhostMode.CHASE;
+	protected Spritesheet frightenedSpritesheet;
+	protected boolean frightenedCooldown;
 	protected int targetX, targetY;
 
 	public Ghost(String id, int x, int y, int width, int height, Spritesheet spritesheet, boolean spawning,
@@ -26,6 +29,25 @@ public class Ghost extends Entity {
 			this.speed *= 2f; 
 			this.lastTime = this.speed/2d; 
 		}
+		this.frightenedSpritesheet = new Spritesheet("assets/classicmaze/frightenedGhost.png", 0.1, 2, 2, 4);
+		this.frightenedCooldown = false;
+	}
+
+	public void setMode(GhostMode mode, boolean force) {
+		if (this.mode != mode && (this.mode != GhostMode.FRIGHTENED || force)) { 
+			this.mode = mode;
+			if (mode.rotate180()) {
+				this.direction = Direction.fromAtoB(x, y, oldX, oldY);
+			}
+		}
+	}
+	
+	public GhostMode getMode() {
+		return mode;
+	}
+	
+	public void setFrightenedCooldown(boolean frightenedCooldown) {
+		this.frightenedCooldown = frightenedCooldown;
 	}
 
 	@Override
@@ -43,37 +65,94 @@ public class Ghost extends Entity {
 				case DOWN:
 					index = DOWN_ANIMATION_INDEX;
 					centerY += offset;
-					spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
-							animationFrame % spritesheet.getFrameCount(index));
 					break;
 				case LEFT:
 					index = LEFT_ANIMATION_INDEX;
 					centerX -= offset;
-					spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
-							animationFrame % spritesheet.getFrameCount(index));
 					break;
 				case RIGHT:
 					index = RIGHT_ANIMATION_INDEX;
 					centerX += offset;
-					spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
-							animationFrame % spritesheet.getFrameCount(index));
 					break;
 				case UP:
 					index = UP_ANIMATION_INDEX;
 					centerY -= offset;
-					spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
-							animationFrame % spritesheet.getFrameCount(index));
 					break;
 				default:
 					break;
 				}
+				spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
+						animationFrame % spritesheet.getFrameCount(index));
 			}
 			if (timeSinceLastFrame >= spritesheet.getFrameTime()) {
 				timeSinceLastFrame = 0;
 				animationFrame = (animationFrame + 1) % spritesheet.getFrameCount(index);
 			}
 		} else {
-			super.draw(brush);
+			float centerX = getCenterX(), centerY = getCenterY(),
+					offset = (float) (MathUtils.normalize(lastTime, speed)-0.5)*game.getCurrentMaze().getTileSize();
+			int index = IDLE_ANIMATION_INDEX;
+			if (direction == null) {
+				if (mode != GhostMode.FRIGHTENED) {
+					spritesheet.drawSprite(brush, (int) centerX, (int) centerY, IDLE_ANIMATION_INDEX,
+							animationFrame % spritesheet.getFrameCount(IDLE_ANIMATION_INDEX));
+				} else {
+					if (frightenedCooldown)
+						frightenedSpritesheet.drawSprite(brush, (int) centerX, (int) centerY, FRIGHTENED_BLINKING_INDEX,
+								animationFrame % frightenedSpritesheet.getFrameCount(FRIGHTENED_BLINKING_INDEX));
+					else
+						frightenedSpritesheet.drawSprite(brush, (int) centerX, (int) centerY, FRIGHTENED_NORMAL_INDEX,
+								animationFrame % frightenedSpritesheet.getFrameCount(FRIGHTENED_NORMAL_INDEX));
+				}
+			} else {
+				if (offset > 0 && !game.isEnoughSpaceInDirection(this, direction, 1, false)) {
+					offset = 0;
+				}
+				Direction offsetDirection = direction;
+				if (offset < 0) {
+					offsetDirection = Direction.fromAtoB(oldX, oldY, x, y);
+				}
+				switch (offsetDirection) {
+				case DOWN:
+					index = DOWN_ANIMATION_INDEX;
+					centerY += offset;
+					break;
+				case LEFT:
+					index = LEFT_ANIMATION_INDEX;
+					centerX -= offset;
+					break;
+				case RIGHT:
+					index = RIGHT_ANIMATION_INDEX;
+					centerX += offset;
+					break;
+				case UP:
+					index = UP_ANIMATION_INDEX;
+					centerY -= offset;
+					break;
+				}
+				if (mode != GhostMode.FRIGHTENED) {
+					spritesheet.drawSprite(brush, (int) centerX, (int) centerY, index,
+							animationFrame % spritesheet.getFrameCount(index));
+				} else {
+					if (frightenedCooldown)
+						frightenedSpritesheet.drawSprite(brush, (int) centerX, (int) centerY, FRIGHTENED_BLINKING_INDEX,
+								animationFrame % frightenedSpritesheet.getFrameCount(FRIGHTENED_BLINKING_INDEX));
+					else
+						frightenedSpritesheet.drawSprite(brush, (int) centerX, (int) centerY, FRIGHTENED_NORMAL_INDEX,
+								animationFrame % frightenedSpritesheet.getFrameCount(FRIGHTENED_NORMAL_INDEX));
+				}
+			}
+			if (timeSinceLastFrame >= spritesheet.getFrameTime()) {
+				timeSinceLastFrame = 0;
+				if (mode != GhostMode.FRIGHTENED) {
+					animationFrame = (animationFrame + 1) % spritesheet.getFrameCount(index);
+				} else {
+					if (frightenedCooldown)
+						animationFrame = (animationFrame + 1) % frightenedSpritesheet.getFrameCount(FRIGHTENED_BLINKING_INDEX);
+					else
+						animationFrame = (animationFrame + 1) % frightenedSpritesheet.getFrameCount(FRIGHTENED_NORMAL_INDEX);
+				}
+			}
 		}
 		brush.setRenderingHints(game.antialiasingRH);
 	}
@@ -93,6 +172,7 @@ public class Ghost extends Entity {
 	@Override
 	public void act(double delta) {
 		super.act(delta);
+		this.setMode(game.getGameLevel().getDifficulty().getModeForTime(lifeTime), false);
 		
 		try {
 			if (game.getCurrentMaze().getSpeedRestrictionZones()[x][y]) {
@@ -101,7 +181,7 @@ public class Ghost extends Entity {
 				speed = SPEED;
 			}
 		} catch (ArrayIndexOutOfBoundsException e) {};
-		if (lastTime >= speed / game.getSpeed().getSpeedFactor()) {
+		if (lastTime >= getSpeed()) {
 			lastTime = 0;
 			
 			if (direction != null && !spawning) {
