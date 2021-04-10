@@ -22,17 +22,22 @@ import pacman.game.entities.Ghost;
 import pacman.game.entities.PacMan;
 import pacman.game.maze.Maze;
 import pacman.game.maze.classic.pellets.Pellet;
+import pacman.game.maze.classic.pellets.PowerPelletAction;
+import pacman.game.maze.classic.pellets.PowerPelletCooldownAction;
 import pacman.utils.Direction;
+import pacman.utils.MathUtils;
 
 public class Game extends JPanel {
 	private static final long serialVersionUID = 1L;
-	public static final int MARGIN = 8;
+	public static final int MARGIN = 8, POWER_PELLET_DURATION = 8000, POWER_PELLET_MINIMAL_DURATION = 4000;
 	private List<Entity> entities;
 	private Maze currentMaze;
 	public final RenderingHints antialiasingRH, noAntialiasingRH;
 	private GameSpeed speed;
 	private GameLevel gameLevel;
 	private boolean powerPellet, eaten, clearing;
+	private PowerPelletAction powerPelletAction = new PowerPelletAction();
+	private PowerPelletCooldownAction powerPelletCooldownAction = new PowerPelletCooldownAction();
 
 	public Game() {
 		this.entities = new ArrayList<Entity>();
@@ -174,20 +179,33 @@ public class Game extends JPanel {
 	}
 	
 	public void restart() {
-		Application.pauseTimer();
+		Application.pauseGameTimer();
+		for (Clips clip : Clips.values()) {
+			clip.setAlreadyPlayed(false);
+		}
 		for (Entity entity : this.entities) {
 			if (entity instanceof PacMan)
 				((PacMan) entity).respawn();
 			if (entity instanceof Ghost)
 				((Ghost) entity).reset();
 		}
-		Application.resumeTimer(Application.SPAWN_DELAY);
+		Application.playSound(Clips.game_start, 1, false);
+		Application.resumeGameTimer(Application.SPAWN_DELAY);
 		Application.getTimer().schedule(new TimerTask() {
 			@Override
 			public void run() {
 				Application.getGame().setClearing(false);
 			}
 		}, Application.SPAWN_DELAY);
+	}
+	
+	public void checkIfAllEaten() {
+		int nbScared = 0;
+		for (Entity entity : this.entities) {
+			if (entity instanceof Ghost)
+				nbScared += (((Ghost) entity).getMode() == GhostMode.FRIGHTENED) ? 1 : 0;
+		}
+		powerPellet = (nbScared == 0);
 	}
 
 	public void addEntity(Entity entity) {
@@ -332,5 +350,24 @@ public class Game extends JPanel {
 	
 	public void setClearing(boolean clearing) {
 		this.clearing = clearing;
+	}
+	
+	public void refreshPowerPelletTimer() {
+		powerPelletAction.cancel();
+		powerPelletAction = new PowerPelletAction();
+		powerPelletCooldownAction.cancel();
+		powerPelletCooldownAction = new PowerPelletCooldownAction();
+		int duration = MathUtils.clamp((int) Math.round((POWER_PELLET_DURATION / gameLevel.getSpeedFactor())),
+				POWER_PELLET_MINIMAL_DURATION, POWER_PELLET_DURATION);
+		Application.getPowerPelletTimer().schedule(powerPelletCooldownAction, Math.round(duration * 0.75d));
+		Application.getPowerPelletTimer().schedule(powerPelletAction, duration);
+	}
+	
+	public PowerPelletAction getPowerPelletAction() {
+		return powerPelletAction;
+	}
+	
+	public PowerPelletCooldownAction getPowerPelletCooldownAction() {
+		return powerPelletCooldownAction;
 	}
 }

@@ -178,7 +178,7 @@ public abstract class Maze {
 	}
 	
 	public boolean[][] getMovementRestrictionZones() {
-		return speedRestrictionZones;
+		return movementRestrictionZones;
 	}
 	
 	public boolean[][] getSpeedRestrictionZones() {

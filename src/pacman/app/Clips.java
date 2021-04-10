@@ -66,6 +66,14 @@ public enum Clips {
 	}
 
 	public static Clips[] getMoveClips() {
-		return new Clips[] {move1, move2, move3};
+		return new Clips[] {move1, move2, move3, move4, move5};
+	}
+	
+	public boolean hasAlreadyBeenPlayed() {
+		return alreadyPlayed;
+	}
+	
+	public void setAlreadyPlayed(boolean alreadyPlayed) {
+		this.alreadyPlayed = alreadyPlayed;
 	}
 }

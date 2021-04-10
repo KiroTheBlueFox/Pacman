@@ -16,6 +16,8 @@ import pacman.game.TopMenu;
 import pacman.game.entities.PacMan;
 import pacman.game.maze.Maze;
 import pacman.game.maze.classic.ClassicMaze;
+import pacman.game.maze.classic.pellets.PowerPelletAction;
+import pacman.game.maze.classic.pellets.PowerPelletCooldownAction;
 import pacman.utils.Direction;
 
 public class Application {
@@ -26,7 +28,7 @@ public class Application {
 	private static JFrame window;
 	private static Random random;
 	private static Timer actTimer, drawTimer, powerPelletTimer;
-	public static final int FPS = 100, SPAWN_DELAY = 3000;
+	public static final int FPS = 100, SPAWN_DELAY = 4500;
 	public static final long DEFAULT_SEED = 0;
 	public static final float DEFAULT_VOLUME = 0.8f;
 	public static boolean debug = false;
@@ -67,27 +69,61 @@ public class Application {
 		powerPelletTimer = new Timer();
 	}
 	
-	public static void pauseTimer() {
+	public static void pauseGameTimer() {
 		actTimer.cancel();
 	}
 	
-	public static void resumeTimer(int delay) {
+	public static void resumeGameTimer(int delay) {
 		actTimer = new Timer();
 		actTimer.schedule(new ActRefresher(delay), delay, 1000/FPS);
 	}
 	
-	public static void resumeTimer() {
-		resumeTimer(0);
+	public static void resumeGameTimer() {
+		resumeGameTimer(0);
+	}
+	
+	public static void pauseDrawTimer() {
+		drawTimer.cancel();
+	}
+	
+	public static void resumeDrawTimer(int delay) {
+		drawTimer = new Timer();
+		drawTimer.schedule(new DrawRefresher(), delay, 1000/FPS);
+	}
+	
+	public static void resumeDrawTimer() {
+		drawTimer = new Timer();
+		drawTimer.schedule(new DrawRefresher(), 0, 1000/FPS);
+	}
+	
+	public static void pausePowerPelletTimer() {
+		powerPelletTimer.cancel();
+	}
+	
+	public static void resumePowerPelletTimer(int delay) {
+		powerPelletTimer = new Timer();
+		if (delay + game.getPowerPelletCooldownAction().scheduledExecutionTime() - System.currentTimeMillis() >= 0)
+			powerPelletTimer.schedule(new PowerPelletCooldownAction(),
+					delay + game.getPowerPelletCooldownAction().scheduledExecutionTime() - System.currentTimeMillis());
+		powerPelletTimer.schedule(new PowerPelletAction(),
+				delay + game.getPowerPelletAction().scheduledExecutionTime() - System.currentTimeMillis());
+	}
+	
+	public static void resumePowerPelletTimer() {
+		powerPelletTimer = new Timer();
+		powerPelletTimer.schedule(new PowerPelletAction(), 0);
 	}
 
 	private static void startGame() {
 		Maze maze = new ClassicMaze();
 		game.setCurrentMaze(maze);
-
+		
 //		player = new PacMan((maze.getPlayerSpawnX()-maze.getTileSize()/2f)/(float) maze.getTileSize(), (maze.getPlayerSpawnY()-maze.getTileSize()/2f)/(float) maze.getTileSize(), maze.getTileSize(), maze.getTileSize());
 		player = new PacMan(maze.getPlayerSpawnX(), maze.getPlayerSpawnY(), maze.getTileSize(), maze.getTileSize(), Direction.LEFT);
 		player.setDirection(Direction.LEFT);
 		game.addEntity(player);
+		
+		playSound(Clips.game_start, 1, false);
 	}
 
 	public static synchronized boolean playSound(Clips clip1, int times, boolean force) {

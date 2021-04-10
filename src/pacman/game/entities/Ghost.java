@@ -320,12 +320,15 @@ public class Ghost extends Entity {
 	}
 	
 	public void eat(PacMan player) {
-		Application.pauseTimer();
+		Application.pauseGameTimer();
+		Application.pausePowerPelletTimer();
 		player.addGhostCombo();
 		player.addScore(SCORE_WHEN_EATEN*player.getGhostCombo());
 		Application.playSound(Clips.eat_ghost, 1, false);
 		setMode(GhostMode.EATEN, true);
-		Application.resumeTimer(EATING_DELAY);
+		game.checkIfAllEaten();
+		Application.resumeGameTimer(EATING_DELAY);
+		Application.resumePowerPelletTimer(EATING_DELAY);
 	}
 	
 	public void reset() {

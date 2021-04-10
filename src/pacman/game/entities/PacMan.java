@@ -11,7 +11,7 @@ import pacman.utils.Spritesheet;
 
 public class PacMan extends Entity {
 	protected static final int DEATH_ANIMATION_INDEX = 5;
-	protected static final float SPEED = 0.132f, TIME_BEFORE_DEATH_ANIMATION = 0.25f;
+	protected static final float SPEED = 0.132f, TIME_BEFORE_DEATH_ANIMATION = 0.5f;
 	private double timeSinceDead = 0;
 	private int score, lives, ghostCombo;
 	private boolean dead = false;
@@ -119,6 +119,7 @@ public class PacMan extends Entity {
 					Application.playSound(Clips.death2, 1, false);
 					if (timeSinceDead > spritesheet.getFrameCount(DEATH_ANIMATION_INDEX)
 							* spritesheet.getFrameTime(DEATH_ANIMATION_INDEX) + TIME_BEFORE_DEATH_ANIMATION * 2) {
+						Application.stopSound(Clips.death2);
 						dead = false;
 						game.restart();
 					}
@@ -165,22 +166,26 @@ public class PacMan extends Entity {
 					}
 				}
 			}
-			for (Entity entity : game.getEntities()) {
-				if (entity instanceof Ghost && entity.getX() == x && entity.getY() == y) {
-					Ghost ghost = (Ghost) entity;
-					switch (ghost.getMode()) {
-					case CHASE:
-					case SCATTER:
-						die();
-						break;
-					case FRIGHTENED:
-						ghost.eat(this);
-						break;
-					default:
-						break;
+			try {
+				if (!game.getCurrentMaze().getSpeedRestrictionZones()[x][y]) {
+					for (Entity entity : game.getEntities()) {
+						if (entity instanceof Ghost && entity.getX() == x && entity.getY() == y) {
+							Ghost ghost = (Ghost) entity;
+							switch (ghost.getMode()) {
+							case CHASE:
+							case SCATTER:
+								die();
+								break;
+							case FRIGHTENED:
+								ghost.eat(this);
+								break;
+							default:
+								break;
+							}
+						}
 					}
 				}
-			}
+			} catch (ArrayIndexOutOfBoundsException e) {}
 		}
 	}
 	
